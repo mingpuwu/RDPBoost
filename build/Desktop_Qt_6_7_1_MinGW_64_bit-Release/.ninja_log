@@ -1,0 +1,21 @@
+# ninja log v5
+18	2638	7388696315168343	RDPBoost_autogen/mocs_compilation.cpp	1812ef53f8fad9af
+18	2638	7388696315168343	RDPBoost_autogen/timestamp	1812ef53f8fad9af
+18	2638	7388696315168343	C:/Users/mingpu.wu/Documents/RDPBoost/build/Desktop_Qt_6_7_1_MinGW_64_bit-Release/RDPBoost_autogen/timestamp	1812ef53f8fad9af
+3035	8897	7388696380203713	CMakeFiles/RDPBoost.dir/mainwindow.cpp.obj	880ca1c20cb09ebb
+2639	6619	7388696357076071	CMakeFiles/RDPBoost.dir/main.cpp.obj	420b841d262dcecb
+18	2638	7388696315168343	C:/Users/mingpu.wu/Documents/RDPBoost/build/Desktop_Qt_6_7_1_MinGW_64_bit-Release/RDPBoost_autogen/mocs_compilation.cpp	1812ef53f8fad9af
+0	104	0	CMakeFiles/clean.additional	321391b2684b2653
+8898	9283	7388696383979746	RDPBoost.exe	2f3e08b0ccd19246
+2937	7133	7388696362500733	CMakeFiles/RDPBoost.dir/RDPBoost_autogen/mocs_compilation.cpp.obj	1c0b8dbc81d97615
+2983	8297	7388696374182069	CMakeFiles/RDPBoost.dir/rdp.cpp.obj	d3944bc6594178b3
+104	125	0	clean	577b940aee94fbd7
+3	2263	7388700914653366	RDPBoost_autogen/timestamp	3e0d0fb6e32759cb
+3	2263	7388700914653366	RDPBoost_autogen/mocs_compilation.cpp	3e0d0fb6e32759cb
+3	2263	7388700914653366	C:/Users/mingpu.wu/Documents/RDPBoost/build/Desktop_Qt_6_7_1_MinGW_64_bit-Release/RDPBoost_autogen/timestamp	3e0d0fb6e32759cb
+3	2263	7388700914653366	C:/Users/mingpu.wu/Documents/RDPBoost/build/Desktop_Qt_6_7_1_MinGW_64_bit-Release/RDPBoost_autogen/mocs_compilation.cpp	3e0d0fb6e32759cb
+2344	6417	7388700958083250	CMakeFiles/RDPBoost.dir/rdp.cpp.obj	c1ec3a15bf8ab834
+2264	6484	7388700958794137	CMakeFiles/RDPBoost.dir/main.cpp.obj	e2ebc4fbb35b6b33
+2290	7106	7388700965000010	CMakeFiles/RDPBoost.dir/RDPBoost_autogen/mocs_compilation.cpp.obj	a0d76621e8539e78
+2313	7622	7388700970142131	CMakeFiles/RDPBoost.dir/mainwindow.cpp.obj	907e73be94f259f0
+7624	8594	7388700979833991	RDPBoost.exe	3a56a004984a9995
