@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-a4c3ff18a44514fcd7b9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "RDPBoost",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "RDPBoost::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RDPBoost-Debug-8d6a22fbb5373f1682eb.json",
+					"name" : "RDPBoost",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RDPBoost_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RDPBoost_autogen-Debug-bba11ec79e45cf02ebec.json",
+					"name" : "RDPBoost_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RDPBoost_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RDPBoost_autogen_timestamp_deps-Debug-707ec63a6b3085e8282d.json",
+					"name" : "RDPBoost_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/mingp/Documents/RDPBoost/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug",
+		"source" : "C:/Users/mingp/Documents/RDPBoost"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
