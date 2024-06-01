@@ -2,15 +2,26 @@
 #define RDP_H
 #include <QWidget>
 #include <QLabel>
+#include <list>
+#include <vector>
 
 class RdpSubWindows:public QWidget
 {
     Q_OBJECT
 public :
-    explicit RdpSubWindows(QWidget *parent = nullptr);
+    RdpSubWindows(QWidget *parent = nullptr);
+
+protected:
+    void mouseMoveEvent(QMouseEvent *event) override;
+
+    void mousePressEvent(QMouseEvent *event) override;
+
+private:
+    void StartCommounicateThread();
 
 private:
     QLabel *imageLabel;
+    std::list<>
 };
 
 #endif // RDP_H
