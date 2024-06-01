@@ -9,6 +9,7 @@
 </p>
 
 > Remote desktop based on C++, supporting intranet penetration through P2P and relay service communication
+> TODO:add communicate with relay server
 
 ### ✨ [Demo](https://www.example.com/)
 
