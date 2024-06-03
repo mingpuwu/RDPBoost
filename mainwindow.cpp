@@ -74,17 +74,3 @@ void MainWindow::on_pushButton_clicked()
     rdp->setMouseTracking(true);
     rdp->show();
 }
-
-void MainWindow::mouseMoveEvent(QMouseEvent *event)
-{
-    // 当鼠标在窗口内移动时，这个函数会被调用
-    // 'event' 参数包含了鼠标事件的详细信息
-
-    // 打印鼠标当前位置的坐标
-    qDebug() << "main windwos Mouse is at:" << event->pos();
-
-    // 可以在这里添加更多的逻辑来处理鼠标移动事件
-    
-    // 调用基类的 mouseMoveEvent 来确保正常的事件处理不被阻断
-    QWidget::mouseMoveEvent(event);
-}
