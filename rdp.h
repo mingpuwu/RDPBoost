@@ -4,6 +4,8 @@
 #include <QLabel>
 #include <list>
 #include <vector>
+#include "RemoteCommunicate.h"
+#include <memory>
 
 class RdpSubWindows:public QWidget
 {
@@ -11,6 +13,7 @@ class RdpSubWindows:public QWidget
 public :
     RdpSubWindows(QWidget *parent = nullptr);
 
+    ~RdpSubWindows();
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 
@@ -21,7 +24,7 @@ private:
 
 private:
     QLabel *imageLabel;
-    std::list<>
+    std::shared_ptr<RemoteCommunicate> RemCPoint;
 };
 
 #endif // RDP_H

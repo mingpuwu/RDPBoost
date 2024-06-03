@@ -3,7 +3,7 @@
 
 enum class MessageType
 {
-    MouseMessageType = 0,
+    MouseMessageType = 10,
 };
 
 class RemoteMessage
@@ -11,16 +11,19 @@ class RemoteMessage
 public:
     RemoteMessage();
 
+    MessageType GetMessageType();
+
     virtual ~RemoteMessage();
+
+public:
+    MessageType type;
+
 };
 
-class RemoteMouseMessage
+class RemoteMouseMessage:public RemoteMessage
 {
 public:
     RemoteMouseMessage();
-
-private:
-    MessageType type;
 };
 
 #endif // REMOTEPROTOCOL_H
