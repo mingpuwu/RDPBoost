@@ -9,6 +9,8 @@
 #include <mutex>
 #include <condition_variable>
 #include <thread>
+#include <iostream>
+#include <winsock2.h>
 
 using std::string;
 
@@ -30,6 +32,10 @@ public:
 private:
     bool CommunicateThreadStart();
 
+    bool NetThreadStart();
+
+    void NetMessageHandler();
+
 private:
     std::list<std::shared_ptr<RemoteMessage>> SendMessageList;
 
@@ -40,7 +46,9 @@ private:
     //连接状态
     bool ConnectStatus;
 
-    std::thread Worker;
+    std::thread EventWorker;
+    std::thread NetWorker;
 
+    SOCKET client_socket;
 };
 #endif // REMOTECOMMUNICATE_H

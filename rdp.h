@@ -19,12 +19,14 @@ protected:
 
     void mousePressEvent(QMouseEvent *event) override;
 
+    void closeEvent(QCloseEvent *event) override;
+
 private:
     void StartCommounicateThread();
 
 private:
     QLabel *imageLabel;
-    std::shared_ptr<RemoteCommunicate> RemCPoint;
+    RemoteCommunicate* RemCPoint;
 };
 
 #endif // RDP_H
