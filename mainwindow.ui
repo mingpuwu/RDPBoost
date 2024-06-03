@@ -314,7 +314,7 @@
      </item>
      <item row="0" column="0">
       <widget class="QWidget" name="widget_4" native="true">
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
