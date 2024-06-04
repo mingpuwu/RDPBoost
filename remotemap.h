@@ -3,10 +3,7 @@
 
 #include <QWidget>
 #include <QLabel>
-#include <list>
-#include <vector>
 #include "RemoteCommunicate.h"
-#include <memory>
 
 namespace Ui {
 class RemoteMap;

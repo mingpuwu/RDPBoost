@@ -1,11 +1,9 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "remotemap.h"
 #include <QVBoxLayout>
 #include <iostream>
 #include <QDebug>
-#include "remotemap.h"
-#include <QMediaPlayer>
-#include <QVideoWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -71,17 +69,7 @@ void MainWindow::on_pushButton_clicked()
     QString connectId = ui->lineEdit->text();
     std::cout<<"connect:"<<connectId.toStdString()<<std::endl;
 
-    QMediaPlayer* player = new QMediaPlayer;
-    QVideoWidget* vw = new QVideoWidget;
-
-    player->setVideoOutput(vw);
-    player->setMedia(QUrl::fromLocalFile("/c/Users/mingpu.wu/Pictures/test_video.mp4"));
-
-    vw->show();
-    player->play();
-
-    // //setMouseTracking(true);
-    // RemoteMap *rdp = new RemoteMap();
-    // rdp->setMouseTracking(true);
-    // rdp->show();
+    RemoteMap *rdp = new RemoteMap();
+    rdp->setMouseTracking(true);
+    rdp->show();
 }

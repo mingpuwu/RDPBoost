@@ -1,12 +1,16 @@
 #include "remotemap.h"
 #include "ui_remotemap.h"
+#include "RemoteCommunicate.h"
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QLabel>
 #include <QMouseEvent>
 #include <iostream>
 #include <memory>
-#include "RemoteCommunicate.h"
+#include <QMediaPlayer>
+#include <QLabel>
+#include <QMovie>
+#include <QVideoWidget>
 
 RemoteMap::RemoteMap(QWidget *parent)
     : QWidget(parent)
@@ -21,6 +25,16 @@ RemoteMap::RemoteMap(QWidget *parent)
     }
 
     this->resize(800, 600);
+
+    QVideoWidget *videoWidget = new QVideoWidget(this);
+    videoWidget->resize(400, 300);
+    // 设置视频输出到videoWidget
+    QMediaPlayer *player = new QMediaPlayer;
+    player->setVideoOutput(videoWidget);
+    // 加载媒体并播放
+    // player->setSource(QUrl::fromLocalFile("D:/GitCode/RDPBoost/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/test.mp4"));
+    player->setSource(QUrl::fromLocalFile("test.mp4"));
+    player->play();
 }
 
 RemoteMap::~RemoteMap()
