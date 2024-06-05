@@ -12,6 +12,24 @@
 #include <QMovie>
 #include <QVideoWidget>
 
+VideoWidget::VideoWidget(QVideoWidget *parent): QVideoWidget(parent)
+{
+
+}
+
+VideoWidget::~VideoWidget()
+{
+
+}
+
+void VideoWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    qDebug() << "VideoWidget Mouse is at:" << event->pos();
+
+    // 调用基类的 mouseMoveEvent 来确保正常的事件处理不被阻断
+    QVideoWidget::mouseMoveEvent(event);
+}
+
 RemoteMap::RemoteMap(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::RemoteMap)
@@ -26,7 +44,7 @@ RemoteMap::RemoteMap(QWidget *parent)
 
     this->resize(800, 600);
 
-    QVideoWidget *videoWidget = new QVideoWidget(this);
+    VideoWidget *videoWidget = new VideoWidget(parent);
     videoWidget->resize(400, 300);
     // 设置视频输出到videoWidget
     QMediaPlayer *player = new QMediaPlayer;

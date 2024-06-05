@@ -3,11 +3,23 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <QVideoWidget>
 #include "RemoteCommunicate.h"
 
 namespace Ui {
 class RemoteMap;
 }
+
+class VideoWidget: public QVideoWidget
+{
+    Q_OBJECT
+public:
+    explicit VideoWidget(QVideoWidget *parent = nullptr);
+    ~VideoWidget();
+
+protected:
+    void mouseMoveEvent(QMouseEvent *event) override;
+};
 
 class RemoteMap : public QWidget
 {
