@@ -12,7 +12,7 @@
 #include <QMovie>
 #include <QVideoWidget>
 
-VideoWidget::VideoWidget(QVideoWidget *parent): QVideoWidget(parent)
+VideoWidget::VideoWidget(QWidget *parent): QVideoWidget(parent)
 {
 
 }
@@ -44,7 +44,7 @@ RemoteMap::RemoteMap(QWidget *parent)
 
     this->resize(800, 600);
 
-    VideoWidget *videoWidget = new VideoWidget(parent);
+    VideoWidget *videoWidget = new VideoWidget(this);
     videoWidget->resize(400, 300);
     // 设置视频输出到videoWidget
     QMediaPlayer *player = new QMediaPlayer;
