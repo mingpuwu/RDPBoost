@@ -36,7 +36,7 @@ RemoteMap::RemoteMap(QWidget *parent)
 {
     ui->setupUi(this);
 
-    RemCPoint = new RemoteCommunicate();
+    RemCPoint = new RemoteCommunicate(WorkMode::WORK_MODE_CLIENT);
     if (RemCPoint == nullptr)
     {
         std::cout << "make shared remotecommunicate error" << std::endl;

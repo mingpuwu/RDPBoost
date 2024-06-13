@@ -16,10 +16,16 @@ using std::string;
 
 using ConnectCallBack = std::function<int(bool)>;
 
+enum class WorkMode
+{
+    WORK_MODE_CLIENT = 0,
+    WORK_MODE_SERVER = 1,
+};
+
 class RemoteCommunicate
 {
 public:
-    RemoteCommunicate();
+    RemoteCommunicate(WorkMode mode);
 
     virtual ~RemoteCommunicate();
 
@@ -50,5 +56,7 @@ private:
     std::thread NetWorker;
 
     SOCKET client_socket;
+
+    WorkMode workmode;
 };
 #endif // REMOTECOMMUNICATE_H

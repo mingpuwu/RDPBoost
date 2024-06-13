@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <iostream>
 #include <QDebug>
+#include "server.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -57,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
     QPixmap m_pic = icon.pixmap(icon.actualSize(QSize(10, 10)));
     ui->label_11->setPixmap(m_pic);
     
+    Server ServerInstance;
+    ServerInstance.Start();
 }
 
 MainWindow::~MainWindow()

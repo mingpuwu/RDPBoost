@@ -18,9 +18,8 @@ static int ConnectCallBackHandler(bool status)
     return 0;
 } 
 
-RemoteCommunicate::RemoteCommunicate()
+RemoteCommunicate::RemoteCommunicate(WorkMode mode):workmode(mode),ConnectStatus(false)
 {
-    ConnectStatus = false;
     CommunicateThreadStart();
     NetThreadStart();
 }
