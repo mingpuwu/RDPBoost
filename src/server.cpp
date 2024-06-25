@@ -27,7 +27,7 @@ void Server::ScreenCapture()
     // 获取屏幕的句柄
     HDC hdcScreen = GetDC(NULL);
     if (hdcScreen == NULL) {
-        std::cout << "获取屏幕句柄失败" << std::endl;
+        std::cout << "get dc error" << std::endl;
         return;
     }
 
@@ -38,7 +38,7 @@ void Server::ScreenCapture()
     // 创建位图对象
     HBITMAP hBitmap = CreateCompatibleBitmap(hdcScreen, screenWidth, screenHeight);
     if (hBitmap == NULL) {
-        std::cout << "创建位图对象失败" << std::endl;
+        std::cout << "CreateCompatibleBitmap error" << std::endl;
         return;
     }
 
@@ -48,14 +48,14 @@ void Server::ScreenCapture()
 
     // 将屏幕内容拷贝到位图对象
     if (!BitBlt(hdcBitmap, 0, 0, screenWidth, screenHeight, hdcScreen, 0, 0, SRCCOPY)) {
-        std::cout << "屏幕拷贝失败" << std::endl;
+        std::cout << "copy error" << std::endl;
         return;
     }
 
     // 保存位图到文件
     std::ofstream file("screenshot.bmp", std::ios::binary);
     if (!file) {
-        std::cout << "打开文件失败" << std::endl;
+        std::cout << "open screenshot error" << std::endl;
         return;
     }
     
@@ -98,7 +98,7 @@ void Server::ScreenCapture()
     DeleteObject(hdcBitmap);
     ReleaseDC(NULL, hdcScreen);
 
-    std::cout << "截图已保存到screenshot.bmp" << std::endl;
+    std::cout << "save screenshot.bmp" << std::endl;
 }
 
 bool Server::SendVideoStream()

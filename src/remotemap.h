@@ -29,6 +29,8 @@ public:
     explicit RemoteMap(QWidget *parent = nullptr);
     ~RemoteMap();
 
+    void StartScreenCapture();
+
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 

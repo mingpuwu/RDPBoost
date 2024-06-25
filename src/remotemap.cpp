@@ -11,6 +11,69 @@
 #include <QLabel>
 #include <QMovie>
 #include <QVideoWidget>
+#include "CDxgiCaptureImpl.h"
+
+static void ScreenCaptureThreadHandler()
+{
+    std::cout<<"ScreenCaptureThreadHandler start"<<std::endl;
+
+    CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(FALSE);
+    TDxgiAdapterOutput out = impl->get(L"");
+    BOOL bRet = impl->InitDxgiCapture(out);
+    if (!bRet)
+    {
+        std::cout << " InitDxgiCapture Error \n";
+        return;
+    }
+
+    INT nWidthPicth = 0;
+    void *pVideoData = NULL;
+    ID3D11Texture2D *pVideoTexture = NULL;
+    while (true)
+    {
+        pVideoTexture = NULL;
+        pVideoData = NULL;
+        nWidthPicth = 0;
+
+        if (impl->CaptureScreen(&pVideoTexture, &pVideoData, nWidthPicth))
+        {
+            if (pVideoTexture)//纹理捕获成功
+            {
+                std::cout << "capture video succuess\n";
+            }
+            else if (nWidthPicth > 0)//视频数据捕获成功  pVideoData就是视频RGBA数据
+            {
+                std::cout << "read raw RGBA data\n";
+                // int width = 1920; // 图像宽度
+                // int height = 1080; // 图像高度
+                // int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
+                // int pitch = nWidthPicth; // 行字节数
+
+                // // pVideoData 已经指向了 mappedRect.pBits
+                // uint8_t* pBits = reinterpret_cast<uint8_t*>(pVideoData);
+
+                // SaveBitmap("output.bmp", pBits, width, height, bytesPerPixel, pitch,true);
+                impl->ReleaseFrame();
+                // break;
+            }
+            else
+            {
+                std::cout << "capture timeout\n";
+            }
+            //成功捕获一帧
+
+        }
+        else
+        {
+            std::cout << "capture error,continue\n";
+            // break;
+        }
+        Sleep(50);
+    }
+
+    impl->UnInitDxgiCapture();
+    return;
+}
 
 VideoWidget::VideoWidget(QWidget *parent): QVideoWidget(parent)
 {
@@ -30,6 +93,14 @@ void VideoWidget::mouseMoveEvent(QMouseEvent *event)
     QVideoWidget::mouseMoveEvent(event);
 }
 
+void RemoteMap::StartScreenCapture()
+{
+    std::cout<<"start capture screen"<<std::endl;
+
+    std::thread ScreenCaptureThread(ScreenCaptureThreadHandler);
+    ScreenCaptureThread.detach();
+}
+
 RemoteMap::RemoteMap(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::RemoteMap)
@@ -43,6 +114,9 @@ RemoteMap::RemoteMap(QWidget *parent)
     }
 
     this->resize(800, 600);
+
+    //采集视频数据
+    this->StartScreenCapture();
 
     VideoWidget *videoWidget = new VideoWidget(this);
     videoWidget->resize(400, 300);
