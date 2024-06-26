@@ -50,7 +50,8 @@ endif()
 target_link_libraries(RDPBoost PRIVATE Qt${QT_VERSION_MAJOR}::Widgets 
                         Qt${QT_VERSION_MAJOR}::Multimedia
                         Qt${QT_VERSION_MAJOR}::MultimediaWidgets
-                        ws2_32)
+                        ws2_32
+                        d3d11 dxgi)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

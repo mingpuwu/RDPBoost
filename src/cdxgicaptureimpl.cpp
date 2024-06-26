@@ -2,8 +2,8 @@
 #include "cdxgicaptureimpl.h"
 #include <iostream>
 
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "dxgi.lib")
+// #pragma comment(lib, "d3d11.lib")
+// #pragma comment(lib, "dxgi.lib")
 
 #define SAFE_RELEASE(obj) if(obj) obj->Release();obj = NULL;
 CDxgiCaptureImpl::CDxgiCaptureImpl(BOOL bUseShareTexture)
