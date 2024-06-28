@@ -13,6 +13,7 @@
 #include <QVideoWidget>
 #include "CDxgiCaptureImpl.h"
 
+
 static void ScreenCaptureThreadHandler()
 {
     std::cout<<"ScreenCaptureThreadHandler start"<<std::endl;
@@ -44,10 +45,11 @@ static void ScreenCaptureThreadHandler()
             else if (nWidthPicth > 0)//视频数据捕获成功  pVideoData就是视频RGBA数据
             {
                 std::cout << "read raw RGBA data\n";
-                // int width = 1920; // 图像宽度
-                // int height = 1080; // 图像高度
-                // int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
-                // int pitch = nWidthPicth; // 行字节数
+                int width = 1920; // 图像宽度
+                int height = 1080; // 图像高度
+                int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
+                int pitch = nWidthPicth; // 行字节数
+
 
                 // // pVideoData 已经指向了 mappedRect.pBits
                 // uint8_t* pBits = reinterpret_cast<uint8_t*>(pVideoData);

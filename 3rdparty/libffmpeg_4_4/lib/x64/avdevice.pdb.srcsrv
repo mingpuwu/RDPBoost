@@ -1,0 +1,28 @@
+SRCSRV: ini ------------------------------------------------
+VERSION=2
+SRCSRV: variables ------------------------------------------
+RAWURL=https://raw.github.com/ShiftMediaProject/FFmpeg.git/37034cc47a8623dba4611f04f0f1beb4e24abb9d/%var2%
+SRCSRVVERCTRL=https
+SRCSRVTRG=%RAWURL%
+SRCSRV: source files ---------------------------------------
+C:\projects\ffmpeg\libavdevice\alldevices.c*libavdevice/alldevices.c
+C:\projects\ffmpeg\libavdevice\avdevice.c*libavdevice/avdevice.c
+C:\projects\ffmpeg\libavdevice\utils.c*libavdevice/utils.c
+C:\projects\ffmpeg\libavdevice\file_open.c*libavdevice/file_open.c
+C:\projects\ffmpeg\libavdevice\dshow_crossbar.c*libavdevice/dshow_crossbar.c
+C:\projects\ffmpeg\libavdevice\dshow.c*libavdevice/dshow.c
+C:\projects\ffmpeg\libavdevice\dshow_enummediatypes.c*libavdevice/dshow_enummediatypes.c
+C:\projects\ffmpeg\libavdevice\dshow_enumpins.c*libavdevice/dshow_enumpins.c
+C:\projects\ffmpeg\libavdevice\dshow_filter.c*libavdevice/dshow_filter.c
+C:\projects\ffmpeg\libavdevice\dshow_pin.c*libavdevice/dshow_pin.c
+C:\projects\ffmpeg\libavdevice\dshow_common.c*libavdevice/dshow_common.c
+C:\projects\ffmpeg\libavdevice\gdigrab.c*libavdevice/gdigrab.c
+C:\projects\ffmpeg\libavdevice\lavfi.c*libavdevice/lavfi.c
+C:\projects\ffmpeg\libavdevice\opengl_enc.c*libavdevice/opengl_enc.c
+C:\projects\ffmpeg\libavdevice\sdl2.c*libavdevice/sdl2.c
+C:\projects\ffmpeg\libavdevice\vfwcap.c*libavdevice/vfwcap.c
+C:\projects\ffmpeg\libavdevice\libcdio.c*libavdevice/libcdio.c
+C:\projects\ffmpeg\SMP\libavdevice\reverse_wrap.c*SMP/libavdevice/reverse_wrap.c
+C:\projects\ffmpeg\libavdevice\avdevice.h*libavdevice/avdevice.h
+C:\projects\ffmpeg\libavdevice\version.h*libavdevice/version.h
+SRCSRV: end ------------------------------------------------

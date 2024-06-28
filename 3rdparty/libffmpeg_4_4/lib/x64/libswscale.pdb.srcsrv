@@ -1,0 +1,30 @@
+SRCSRV: ini ------------------------------------------------
+VERSION=2
+SRCSRV: variables ------------------------------------------
+RAWURL=https://raw.github.com/ShiftMediaProject/FFmpeg.git/37034cc47a8623dba4611f04f0f1beb4e24abb9d/%var2%
+SRCSRVVERCTRL=https
+SRCSRVTRG=%RAWURL%
+SRCSRV: source files ---------------------------------------
+C:\projects\ffmpeg\libswscale\alphablend.c*libswscale/alphablend.c
+C:\projects\ffmpeg\libswscale\hscale.c*libswscale/hscale.c
+C:\projects\ffmpeg\libswscale\hscale_fast_bilinear.c*libswscale/hscale_fast_bilinear.c
+C:\projects\ffmpeg\libswscale\gamma.c*libswscale/gamma.c
+C:\projects\ffmpeg\libswscale\options.c*libswscale/options.c
+C:\projects\ffmpeg\libswscale\rgb2rgb.c*libswscale/rgb2rgb.c
+C:\projects\ffmpeg\libswscale\slice.c*libswscale/slice.c
+C:\projects\ffmpeg\libswscale\swscale.c*libswscale/swscale.c
+C:\projects\ffmpeg\libswscale\swscale_unscaled.c*libswscale/swscale_unscaled.c
+C:\projects\ffmpeg\libswscale\utils.c*libswscale/utils.c
+C:\projects\ffmpeg\libswscale\yuv2rgb.c*libswscale/yuv2rgb.c
+C:\projects\ffmpeg\libswscale\vscale.c*libswscale/vscale.c
+C:\projects\ffmpeg\libswscale\x86\hscale_fast_bilinear_simd.c*libswscale/x86/hscale_fast_bilinear_simd.c
+C:\projects\ffmpeg\SMP\libswscale\log2_tab_wrap.c*SMP/libswscale/log2_tab_wrap.c
+C:\projects\ffmpeg\SMP\libswscale\dce_defs.c*SMP/libswscale/dce_defs.c
+C:\projects\ffmpeg\libswscale\input.c*libswscale/input.c
+C:\projects\ffmpeg\libswscale\output.c*libswscale/output.c
+C:\projects\ffmpeg\libswscale\x86\rgb2rgb.c*libswscale/x86/rgb2rgb.c
+C:\projects\ffmpeg\libswscale\x86\swscale.c*libswscale/x86/swscale.c
+C:\projects\ffmpeg\libswscale\x86\yuv2rgb.c*libswscale/x86/yuv2rgb.c
+C:\projects\ffmpeg\libswscale\swscale.h*libswscale/swscale.h
+C:\projects\ffmpeg\libswscale\version.h*libswscale/version.h
+SRCSRV: end ------------------------------------------------
