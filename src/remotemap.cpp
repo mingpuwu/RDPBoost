@@ -1,21 +1,36 @@
+#include "RemoteCommunicate.h"
+#include "CDxgiCaptureImpl.h"
+#include "Frameplayer.h"
 #include "remotemap.h"
 #include "ui_remotemap.h"
-#include "RemoteCommunicate.h"
+#include "Frameplayer.h"
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QLabel>
 #include <QMouseEvent>
-#include <iostream>
-#include <memory>
 #include <QMediaPlayer>
 #include <QLabel>
 #include <QMovie>
 #include <QVideoWidget>
-#include "CDxgiCaptureImpl.h"
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
+}
+#include <iostream>
+#include <memory>
 
 
-static void ScreenCaptureThreadHandler()
+static void ScreenCaptureThreadHandler(FramePlayer* arg)
 {
+    FramePlayer* Player = dynamic_cast<FramePlayer*>(arg);
+    if(!Player)
+    {
+        std::cout<<"dynamic cast error"<<std::endl;
+        return;
+    }
+
     std::cout<<"ScreenCaptureThreadHandler start"<<std::endl;
 
     CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(FALSE);
@@ -50,7 +65,9 @@ static void ScreenCaptureThreadHandler()
                 int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
                 int pitch = nWidthPicth; // 行字节数
 
-
+                uint8_t* pBits = reinterpret_cast<uint8_t*>(pVideoData);
+                ViewFrame frame(width, height, 30, pBits, AV_PIX_FMT_RGBA);
+                Player->setFrame(frame);
                 // // pVideoData 已经指向了 mappedRect.pBits
                 // uint8_t* pBits = reinterpret_cast<uint8_t*>(pVideoData);
 
@@ -95,11 +112,11 @@ void VideoWidget::mouseMoveEvent(QMouseEvent *event)
     QVideoWidget::mouseMoveEvent(event);
 }
 
-void RemoteMap::StartScreenCapture()
+void RemoteMap::StartScreenCapture(FramePlayer* Player)
 {
     std::cout<<"start capture screen"<<std::endl;
 
-    std::thread ScreenCaptureThread(ScreenCaptureThreadHandler);
+    std::thread ScreenCaptureThread(ScreenCaptureThreadHandler, Player);
     ScreenCaptureThread.detach();
 }
 
@@ -117,18 +134,28 @@ RemoteMap::RemoteMap(QWidget *parent)
 
     this->resize(800, 600);
 
-    //采集视频数据
-    this->StartScreenCapture();
+    QVBoxLayout *layout = new QVBoxLayout(this);
 
-    VideoWidget *videoWidget = new VideoWidget(this);
-    videoWidget->resize(400, 300);
-    // 设置视频输出到videoWidget
-    QMediaPlayer *player = new QMediaPlayer;
-    player->setVideoOutput(videoWidget);
-    // 加载媒体并播放
-    // player->setSource(QUrl::fromLocalFile("D:/GitCode/RDPBoost/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/test.mp4"));
-    player->setSource(QUrl::fromLocalFile("test.mp4"));
-    player->play();
+    FramePlayer* frmaePlayerInstance = new FramePlayer(this);
+    frmaePlayerInstance->setObjectName("video_play");
+    layout->addWidget(frmaePlayerInstance); // 添加到布局中，子控件会自动扩展填满空间
+    this->setLayout(layout);
+
+    frmaePlayerInstance->play(500);
+    //采集视频数据
+    this->StartScreenCapture(frmaePlayerInstance);
+
+    // setCentralWidget(frmaePlayerInstance);
+
+    // VideoWidget *videoWidget = new VideoWidget(this);
+    // videoWidget->resize(400, 300);
+    // // 设置视频输出到videoWidget
+    // QMediaPlayer *player = new QMediaPlayer;
+    // player->setVideoOutput(videoWidget);
+    // // 加载媒体并播放
+    // // player->setSource(QUrl::fromLocalFile("D:/GitCode/RDPBoost/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/test.mp4"));
+    // player->setSource(QUrl::fromLocalFile("test.mp4"));
+    // player->play();
 }
 
 RemoteMap::~RemoteMap()

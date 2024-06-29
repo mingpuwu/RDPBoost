@@ -9,6 +9,7 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+//Decode
 class codecImp
 {
 public:
@@ -16,7 +17,7 @@ public:
 
     ~codecImp();
 
-    bool Init(char* output_file);
+    bool Init();
 
     void StartCodecThread(char* input_file);
 

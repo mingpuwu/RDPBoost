@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QVideoWidget>
 #include "RemoteCommunicate.h"
+#include "Frameplayer.h"
 
 namespace Ui {
 class RemoteMap;
@@ -29,7 +30,7 @@ public:
     explicit RemoteMap(QWidget *parent = nullptr);
     ~RemoteMap();
 
-    void StartScreenCapture();
+    void StartScreenCapture(FramePlayer* Player);
 
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;

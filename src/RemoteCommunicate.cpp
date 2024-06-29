@@ -107,8 +107,8 @@ bool RemoteCommunicate::CommunicateThreadStart()
             SendMessageList.pop_front();
             MessageType id = message->GetMessageType();
 
-            std::cout<<"message type "<<static_cast<int>(id)<<std::endl;
-            std::cout<<"consumer message: list size:"<<SendMessageList.size()<<std::endl;
+            // std::cout<<"message type "<<static_cast<int>(id)<<std::endl;
+            // std::cout<<"consumer message: list size:"<<SendMessageList.size()<<std::endl;
         }
     });
 
@@ -140,7 +140,7 @@ void RemoteCommunicate::NetMessageHandler()
     const char* message = "Hello, server!";
     if (send(client_socket, message, strlen(message), 0) == SOCKET_ERROR) 
     {
-        std::cout << "Sending failed" << std::endl;
+        // std::cout << "Sending failed" << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
         closesocket(client_socket);
         WSACleanup();

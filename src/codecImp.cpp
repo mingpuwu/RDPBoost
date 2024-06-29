@@ -39,30 +39,36 @@ codecImp::~codecImp()
     avformat_free_context(format_context);
 }
 
-bool codecImp::Init(char* output_file)
+bool codecImp::Init()
 {
+    const char* output_file = "video.raw";
+
     av_register_all();
 
     avformat_alloc_output_context2(&format_context, nullptr, nullptr, output_file);
-    if (!format_context) {
+    if (!format_context) 
+    {
         std::cerr << "Could not create output context" << std::endl;
         return false;
     }
 
     codec = avcodec_find_encoder(AV_CODEC_ID_H264);
-    if (!codec) {
+    if (!codec) 
+    {
         std::cerr << "Codec not found" << std::endl;
         return false;
     }
 
     video_stream = avformat_new_stream(format_context, codec);
-    if (!video_stream) {
+    if (!video_stream) 
+    {
         std::cerr << "Could not create video stream" << std::endl;
         return false;
     }
 
     codec_context = avcodec_alloc_context3(codec);
-    if (!codec_context) {
+    if (!codec_context) 
+    {
         std::cerr << "Could not allocate video codec context" << std::endl;
         return false;
     }
@@ -79,7 +85,8 @@ bool codecImp::Init(char* output_file)
     codec_context->pix_fmt = AV_PIX_FMT_YUV420P;
 
     // Open codec
-    if (avcodec_open2(codec_context, codec, nullptr) < 0) {
+    if (avcodec_open2(codec_context, codec, nullptr) < 0) 
+    {
         std::cerr << "Could not open codec" << std::endl;
         return false;
     }
@@ -102,7 +109,8 @@ bool codecImp::Init(char* output_file)
     }
 
     // Write file header
-    if (avformat_write_header(format_context, nullptr) < 0) {
+    if (avformat_write_header(format_context, nullptr) < 0) 
+    {
         std::cerr << "Error occurred when writing header" << std::endl;
         return false;
     }
@@ -128,12 +136,12 @@ bool codecImp::Init(char* output_file)
     }
 
     // Open the input file containing RGBA data
-    std::ifstream input(input_file, std::ios::binary);
-    if (!input.is_open())
-    {
-        std::cerr << "Could not open input file" << std::endl;
-        return false;
-    }
+    // std::ifstream input(input_file, std::ios::binary);
+    // if (!input.is_open())
+    // {
+    //     std::cerr << "Could not open input file" << std::endl;
+    //     return false;
+    // }
 
     // Allocate RGBA frame
     AVFrame* rgba_frame = av_frame_alloc();
@@ -159,7 +167,12 @@ bool codecImp::Init(char* output_file)
 
 void codecImp::StartCodecThread(char* input_file)
 {
-    std::ifstream input(input_file, std::ios::binary);
+    std::ifstream input;
+
+    if(input_file)
+    {
+        std::ifstream input(input_file, std::ios::binary);
+    }
 
     // Encode frames
     int frame_count = 0;
@@ -192,17 +205,22 @@ void codecImp::StartCodecThread(char* input_file)
         }
 
         // Receive packet from encoder
-        while (avcodec_receive_packet(codec_context, &pkt) == 0)
+        while (avcodec_receive_packet(codec_context, pkt) == 0)
         {
-            pkt.stream_index = video_stream_index;
-            av_packet_rescale_ts(&pkt, codec_context->time_base, video_stream->time_base);
+            // pkt->stream_index = video_stream_index;
+            av_packet_rescale_ts(pkt, codec_context->time_base, video_stream->time_base);
             // pkt.pos = -1;
-            if (av_interleaved_write_frame(format_context, &pkt) < 0)
+            if (av_interleaved_write_frame(format_context, pkt) < 0)
             {
                 std::cerr << "Error writing frame" << std::endl;
-                return -1;
+                Ret = -1;
             }
-            av_packet_unref(&pkt);
+            av_packet_unref(pkt);
+
+            if(Ret == -1)
+            {
+                break;
+            }
         }
     }
 }

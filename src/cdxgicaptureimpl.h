@@ -11,6 +11,7 @@ typedef struct stDxgiAdapterOutput
     IDXGIAdapter* pAdapter;
     IDXGIOutput* pOutput;
 }TDxgiAdapterOutput;
+
 class CDxgiCaptureImpl
 {
 public:
