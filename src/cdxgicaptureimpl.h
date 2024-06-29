@@ -4,6 +4,7 @@
 #include <dxgi1_2.h>
 #include <vector>
 #include <string>
+
 using namespace std;
 // 显卡以及输出设备的结构体
 typedef struct stDxgiAdapterOutput

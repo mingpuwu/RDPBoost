@@ -3,9 +3,6 @@
 
 #include <QWidget>
 #include <QFile>
-#include <cstdint>
-#include <list>
-#include <mutex>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -13,6 +10,10 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 }
+
+#include <cstdint>
+#include <list>
+#include <mutex>
 
 class ViewFrame
 {

@@ -19,7 +19,8 @@ public:
 
     bool Init();
 
-    void StartCodecThread(char* input_file);
+    //Encode or Decode
+    void StartCodecThread(char* input_file = nullptr);
 
     void SendFrameToCodec(uint8_t* frame, int width = 1920, int height = 1080);
 

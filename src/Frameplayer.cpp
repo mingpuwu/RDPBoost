@@ -1,7 +1,6 @@
 #include "Frameplayer.h"
 #include <QDebug>
 #include <QPainter>
-#include <iostream>
 #include <QTimerEvent>
 #include <QImage>
 #include <QWidget>
@@ -12,6 +11,8 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 }
+
+#include <iostream>
 
 FramePlayer::FramePlayer(QWidget *parent) : QWidget(parent)
 {

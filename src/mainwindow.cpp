@@ -1,10 +1,10 @@
 #include "mainwindow.h"
+#include "Server.h"
 #include "./ui_mainwindow.h"
-#include "remotemap.h"
+#include "RemoteMap.h"
 #include <QVBoxLayout>
-#include <iostream>
 #include <QDebug>
-#include "server.h"
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

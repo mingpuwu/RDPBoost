@@ -1,9 +1,10 @@
 #include "RemoteCommunicate.h"
 #include "CDxgiCaptureImpl.h"
 #include "Frameplayer.h"
-#include "remotemap.h"
+#include "RemoteMap.h"
 #include "ui_remotemap.h"
 #include "Frameplayer.h"
+
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QLabel>

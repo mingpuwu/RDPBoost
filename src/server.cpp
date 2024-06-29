@@ -1,4 +1,4 @@
-#include "server.h"
+#include "Server.h"
 #include <iostream>
 #include <fstream>
 #include <Windows.h>

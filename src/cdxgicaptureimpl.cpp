@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "cdxgicaptureimpl.h"
+#include "CdxgiCaptureImpl.h"
 #include <iostream>
 
 // #pragma comment(lib, "d3d11.lib")

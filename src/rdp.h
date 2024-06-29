@@ -1,10 +1,10 @@
 #ifndef RDP_H
 #define RDP_H
+#include "RemoteCommunicate.h"
 #include <QWidget>
 #include <QLabel>
 #include <list>
 #include <vector>
-#include "RemoteCommunicate.h"
 #include <memory>
 
 class RdpSubWindows:public QWidget

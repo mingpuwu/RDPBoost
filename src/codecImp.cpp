@@ -1,4 +1,4 @@
-#include "codecImp.h"
+#include "CodecImp.h"
 #include <iostream>
 #include <fstream>
 
@@ -8,7 +8,6 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 }
-
 
 #ifdef av_err2str
 #undef av_err2str
@@ -41,6 +40,7 @@ codecImp::~codecImp()
 
 bool codecImp::Init()
 {
+    //for test
     const char* output_file = "video.raw";
 
     av_register_all();

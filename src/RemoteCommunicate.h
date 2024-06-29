@@ -1,9 +1,10 @@
 #ifndef REMOTECOMMUNICATE_H
 #define REMOTECOMMUNICATE_H
 
+#include "RemoteProtocol.h"
+
 #include <string>
 #include <functional>
-#include "RemoteProtocol.h"
 #include <memory>
 #include <list>
 #include <mutex>
