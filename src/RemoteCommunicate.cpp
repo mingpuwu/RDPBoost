@@ -1,5 +1,6 @@
 #include "RemoteCommunicate.h"
 #include "RemoteProtocol.h"
+#include "DecodeImp.h"
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -13,41 +14,35 @@
 
 static int ConnectCallBackHandler(bool status)
 {
-    std::cout<<"connect success"<<std::endl;
+    std::cout << "connect success callback" << std::endl;
 
     return 0;
-} 
+}
 
-RemoteCommunicate::RemoteCommunicate(WorkMode mode):workmode(mode),ConnectStatus(false)
+RemoteCommunicate::RemoteCommunicate(WorkMode mode) : workmode(mode), State(RCState::RC_STATE_INIT)
 {
     CommunicateThreadStart();
     NetThreadStart();
+    DecodeImpInstance = new DecodeImp();
 }
 
 RemoteCommunicate::~RemoteCommunicate()
 {
-    std::cout<<"RemoteCommunicate delete"<<std::endl;
+    std::cout << "RemoteCommunicate delete" << std::endl;
     DisConnect();
-    //TODO how stop thread
+    // TODO how stop thread
 }
 
+// blocking api
 bool RemoteCommunicate::Connect(string Id, ConnectCallBack cb)
 {
     // JUST connect relay
-    WSADATA wsa_data;
     sockaddr_in server_address;
-    const char* server_ip = RELAY_IP; // 服务器IP地址
-    int server_port = RELAY_PORT; // 服务器端口号
-
-    // 初始化Winsock库
-    if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) 
-    {
-        std::cout << "WSAStartup failed" << std::endl;
-        return false;
-    }
+    const char *server_ip = RELAY_IP; // 服务器IP地址
+    int server_port = RELAY_PORT;     // 服务器端口号
 
     // 创建Socket
-    if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) 
+    if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
     {
         std::cout << "Socket creation failed" << std::endl;
         WSACleanup();
@@ -60,21 +55,29 @@ bool RemoteCommunicate::Connect(string Id, ConnectCallBack cb)
     server_address.sin_port = htons(server_port);
 
     // 连接到服务器
-    if (connect(client_socket, reinterpret_cast<sockaddr*>(&server_address), sizeof(server_address)) == SOCKET_ERROR) 
+    while (1)
     {
-        std::cout << "Connection to server failed" << std::endl;
-        closesocket(client_socket);
-        WSACleanup();
-        return false;
+        if (connect(client_socket, reinterpret_cast<sockaddr *>(&server_address), sizeof(server_address)) == SOCKET_ERROR)
+        {
+            std::cout << "Connection to server failed :" << server_ip << " port:" << server_port << std::endl;
+            closesocket(client_socket);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            continue;
+        }
+        else
+        {
+            std::cout << "Connection success" << std::endl;
+            cb(true);
+            break;
+        }
     }
-    
-    return true;
 
+    return true;
 }
 
 bool RemoteCommunicate::DisConnect()
 {
-    std::cout<<"DisConnect"<<std::endl;
+    std::cout << "DisConnect" << std::endl;
     // 关闭Socket连接
     closesocket(client_socket);
     // 清理Winsock库
@@ -83,9 +86,14 @@ bool RemoteCommunicate::DisConnect()
     return true;
 }
 
+SOCKET RemoteCommunicate::GetSocket()
+{
+    return client_socket;
+}
+
 bool RemoteCommunicate::SendMessage(std::shared_ptr<RemoteMessage> message)
 {
-    std::cout<<"push message to list back"<<std::endl;
+    std::cout << "push message to list back" << std::endl;
     std::unique_lock<std::mutex> lc(this->MessageListMutex);
     this->SendMessageList.push_back(message);
     this->cv.notify_all();
@@ -95,9 +103,10 @@ bool RemoteCommunicate::SendMessage(std::shared_ptr<RemoteMessage> message)
 
 bool RemoteCommunicate::CommunicateThreadStart()
 {
-    std::cout<<"CommunicateThreadStart"<<std::endl;
-    
-    EventWorker = std::thread([this]{
+    std::cout << "CommunicateThreadStart" << std::endl;
+
+    EventWorker = std::thread([this]
+                              {
         while(1)
         {
             std::unique_lock<std::mutex> lc(this->MessageListMutex);
@@ -109,8 +118,7 @@ bool RemoteCommunicate::CommunicateThreadStart()
 
             // std::cout<<"message type "<<static_cast<int>(id)<<std::endl;
             // std::cout<<"consumer message: list size:"<<SendMessageList.size()<<std::endl;
-        }
-    });
+        } });
 
     EventWorker.detach();
 
@@ -119,47 +127,93 @@ bool RemoteCommunicate::CommunicateThreadStart()
 
 bool RemoteCommunicate::NetThreadStart()
 {
-    std::cout<<"NetThreadStart"<<std::endl;
-    
-    NetWorker = std::thread([this]{
-        this->Connect("testid", ConnectCallBackHandler);
+    std::cout << "NetThreadStart" << std::endl;
+
+    NetWorker = std::thread([this]
+                            {
         while(1)
         {
-            NetMessageHandler();
-        }
-    });
+            NetMachineState();
+        } });
 
     NetWorker.detach();
 
     return true;
 }
 
-void RemoteCommunicate::NetMessageHandler()
+void RemoteCommunicate::ProcessMessage()
 {
-    // 发送数据到服务器
-    const char* message = "Hello, server!";
-    if (send(client_socket, message, strlen(message), 0) == SOCKET_ERROR) 
+    const char *message = "Hello, server!";
+    if (send(client_socket, message, strlen(message), 0) == SOCKET_ERROR)
     {
-        // std::cout << "Sending failed" << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         closesocket(client_socket);
-        WSACleanup();
+        client_socket = -1;
+        this->State = RCState::RC_STATE_CONNECTING;
         return;
     }
 
     // 接收服务器的响应
-    char buffer[1024];
-    int bytes_received = recv(client_socket, buffer, 1024, 0);
-    if (bytes_received == SOCKET_ERROR) 
+    DecodeImpInstance->HandlerFrameToDecode();
+    // char buffer[1024];
+    // int bytes_received = recv(client_socket, buffer, 1024, 0);
+    // if (bytes_received == SOCKET_ERROR)
+    // {
+    //     std::cout << "Receiving failed, close socket" << std::endl;
+    //     closesocket(client_socket);
+    //     client_socket = -1;
+    //     std::cout<<"go to RC_STATE_CLOSED"<<std::endl;
+    //     this->State = RCState::RC_STATE_CLOSED;
+    //     return;
+    // }
+    // else
+    // {
+    //     std::cout << "recv server message :" << bytes_received << std::endl;
+
+    // }
+}
+
+void RemoteCommunicate::NetMachineState()
+{
+    WSADATA wsa_data;
+
+    switch (State)
     {
-        std::cout << "Receiving failed" << std::endl;
+    case RCState::RC_STATE_INIT:
+        // 初始化Winsock库
+        if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
+        {
+            std::cout << "WSAStartup failed" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            WSACleanup();
+        }
+        else
+        {
+            std::cout<<"go to RC_STATE_CONNECTING state"<<std::endl;
+            this->State = RCState::RC_STATE_CONNECTING;
+        }
+        break;
+
+    case RCState::RC_STATE_CONNECTING:
+        if (Connect("testid", ConnectCallBackHandler))
+        {
+            std::cout<<"go to RC_STATE_READY state"<<std::endl;
+            DecodeImpInstance->Init(GetSocket());
+            this->State = RCState::RC_STATE_READY;
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        break;
+
+    case RCState::RC_STATE_READY:
+        this->ProcessMessage();
+        break;
+
+    case RCState::RC_STATE_CLOSED:
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        closesocket(client_socket);
-        WSACleanup();
-        return;
-    }
-    else
-    {
-        std::cout<<"recv server message"<<buffer<<std::endl;
+        break;
+    default:
+        break;
     }
 }

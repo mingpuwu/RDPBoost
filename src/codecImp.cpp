@@ -1,13 +1,13 @@
 #include "CodecImp.h"
-#include <iostream>
-#include <fstream>
-
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 }
+
+#include <iostream>
+#include <fstream>
 
 #ifdef av_err2str
 #undef av_err2str
@@ -20,14 +20,14 @@ av_always_inline std::string av_err2string(int errnum)
 #define av_err2str(err) av_err2string(err).c_str()
 #endif // av_err2str
 
-codecImp::codecImp()
+CodecImp::CodecImp()
 {
     this->width = 1920;
     this->height = 1080;
     this->frame_rate = 30;
 }
 
-codecImp::~codecImp()
+CodecImp::~CodecImp()
 {
     // Clean up
     av_frame_free(&frame);
@@ -38,7 +38,7 @@ codecImp::~codecImp()
     avformat_free_context(format_context);
 }
 
-bool codecImp::Init()
+bool CodecImp::Init(CodecType type)
 {
     //for test
     const char* output_file = "video.raw";
@@ -165,7 +165,7 @@ bool codecImp::Init()
 }
 
 
-void codecImp::StartCodecThread(char* input_file)
+void CodecImp::StartCodecThread(char* input_file)
 {
     std::ifstream input;
 
@@ -225,17 +225,17 @@ void codecImp::StartCodecThread(char* input_file)
     }
 }
 
-void codecImp::SendFrameToCodec(uint8_t* frame, int width, int height)
+void CodecImp::SendFrameToCodec(uint8_t* frame, int width, int height)
 {
 
 }
 
-uint8_t* codecImp::PubEncodeFrame()
+uint8_t* CodecImp::PubEncodeFrame()
 {
-
+    return nullptr;
 }
 
-void codecImp::StopCodec()
+void CodecImp::StopCodec()
 {
     std::cout<<"write tail"<<std::endl;
 

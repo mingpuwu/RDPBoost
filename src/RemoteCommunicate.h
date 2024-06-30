@@ -2,6 +2,7 @@
 #define REMOTECOMMUNICATE_H
 
 #include "RemoteProtocol.h"
+#include "DecodeImp.h"
 
 #include <string>
 #include <functional>
@@ -10,7 +11,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <thread>
-#include <iostream>
 #include <winsock2.h>
 
 using std::string;
@@ -23,6 +23,14 @@ enum class WorkMode
     WORK_MODE_SERVER = 1,
 };
 
+enum class RCState
+{
+    RC_STATE_INIT = 0,
+    RC_STATE_CONNECTING,
+    RC_STATE_READY,
+    RC_STATE_CLOSED,
+};
+
 class RemoteCommunicate
 {
 public:
@@ -30,18 +38,22 @@ public:
 
     virtual ~RemoteCommunicate();
 
-    bool Connect(string Id, ConnectCallBack cb);
-
     bool DisConnect();
 
     bool SendMessage(std::shared_ptr<RemoteMessage> message);
+
+    SOCKET GetSocket();
 
 private:
     bool CommunicateThreadStart();
 
     bool NetThreadStart();
 
-    void NetMessageHandler();
+    void ProcessMessage();
+
+    bool Connect(string Id, ConnectCallBack cb);
+
+    void NetMachineState();
 
 private:
     std::list<std::shared_ptr<RemoteMessage>> SendMessageList;
@@ -50,8 +62,7 @@ private:
 
     std::condition_variable cv;
 
-    //连接状态
-    bool ConnectStatus;
+    RCState State;
 
     std::thread EventWorker;
     std::thread NetWorker;
@@ -59,5 +70,7 @@ private:
     SOCKET client_socket;
 
     WorkMode workmode;
+
+    DecodeImp* DecodeImpInstance;
 };
 #endif // REMOTECOMMUNICATE_H

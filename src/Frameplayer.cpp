@@ -99,23 +99,20 @@ void FramePlayer::SendFrame(ViewFrame *frame)
 
 void FramePlayer::timerEvent(QTimerEvent *event)
 {
-    // 从文件读取 YUV 数据，使用 FFmpegUtils::convertRawVideo 转换并更新 QImage _currentImage，
-    //然后调用 update() 刷新显示。
     if (event->timerId() == this->_timerId)
     {
-        std::cout<<"update...."<<std::endl;
+        // std::cout<<"update...."<<std::endl;
         update();
     }
-
 }
 
 void FramePlayer::paintEvent(QPaintEvent *event)
 {
     if (_currentImage)
     {
-        std::cout<<"paintEvent"<<std::endl;
-        qDebug() << "Image size:" << _currentImage->size();
-        qDebug() << "Draw rect:" << _dstRect;
+        // std::cout<<"paintEvent"<<std::endl;
+        // qDebug() << "Image size:" << _currentImage->size();
+        // qDebug() << "Draw rect:" << _dstRect;
         QPainter(this).drawImage(_dstRect, *_currentImage);
     }
 }

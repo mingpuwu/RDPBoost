@@ -56,11 +56,11 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
         {
             if (pVideoTexture)//纹理捕获成功
             {
-                std::cout << "capture video succuess\n";
+                // std::cout << "capture video succuess\n";
             }
             else if (nWidthPicth > 0)//视频数据捕获成功  pVideoData就是视频RGBA数据
             {
-                std::cout << "read raw RGBA data\n";
+                // std::cout << "read raw RGBA data\n";
                 int width = 1920; // 图像宽度
                 int height = 1080; // 图像高度
                 int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
@@ -78,7 +78,7 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
             }
             else
             {
-                std::cout << "capture timeout\n";
+                // std::cout << "capture timeout\n";
             }
             //成功捕获一帧
 

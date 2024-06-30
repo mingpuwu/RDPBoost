@@ -9,15 +9,21 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+enum class CodecType
+{
+    CODECTYPE_ENCODE,
+    CODECTYPE_DECODE,
+};
+
 //Decode
-class codecImp
+class CodecImp
 {
 public:
-    codecImp();
+    CodecImp();
 
-    ~codecImp();
+    ~CodecImp();
 
-    bool Init();
+    bool Init(CodecType type);
 
     //Encode or Decode
     void StartCodecThread(char* input_file = nullptr);
@@ -29,6 +35,7 @@ public:
     void StopCodec();
 
 private:
+    CodecType type;
     AVFormatContext* format_context;
     AVCodec* codec;
     AVStream* video_stream;
