@@ -21,6 +21,7 @@ extern "C" {
 }
 #include <iostream>
 #include <memory>
+#include <fstream>
 
 
 static void ScreenCaptureThreadHandler(FramePlayer* arg)
@@ -46,6 +47,11 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
     INT nWidthPicth = 0;
     void *pVideoData = NULL;
     ID3D11Texture2D *pVideoTexture = NULL;
+
+    #ifdef DEBUG
+    std::ofstream outfile("testrawencode.video",std::ios::binary);
+    #endif
+
     while (true)
     {
         pVideoTexture = NULL;
@@ -66,6 +72,9 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
                 int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
                 int pitch = nWidthPicth; // 行字节数
 
+                #ifdef DEBUG_BUILD
+                // outfile.write(pVideoData, );
+                #endif
                 uint8_t* pBits = reinterpret_cast<uint8_t*>(pVideoData);
                 ViewFrame frame(width, height, 30, pBits, AV_PIX_FMT_RGBA);
                 Player->setFrame(frame);

@@ -14,6 +14,7 @@ CDxgiCaptureImpl::CDxgiCaptureImpl(BOOL bUseShareTexture)
 
 CDxgiCaptureImpl::~CDxgiCaptureImpl()
 {
+    
 }
 
 TDxgiAdapterOutput CDxgiCaptureImpl::get(wstring strDeviceName)

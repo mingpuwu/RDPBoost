@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.5)
 
 project(RDPBoost VERSION 0.1 LANGUAGES CXX)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Configuring for Debug build")
+    add_definitions(-DDEBUG)
+endif()
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
