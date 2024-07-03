@@ -4,108 +4,73 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
-#include <libavutil/avutil.h>
+#include <libavcodec/packet.h>
 }
-#include <winsock2.h>
-#include <cstdint>
 #include <iostream>
 
-#pragma comment(lib, "ws2_32.lib")
+#define TESTRECORDFILE "../RecordRgba.raw"
 
-static int socket_read(void *opaque, uint8_t *buf, int buf_size)
+DecodeImp::DecodeImp():RecordFileName(TESTRECORDFILE)
 {
-    std::cout<<"socket read call"<<std::endl;
-
-    char *bufpoint = reinterpret_cast<char*>(buf);
-    int ret = recv(*(SOCKET*)opaque, bufpoint, buf_size, 0);
-
-    std::cout<<"recv ret:"<<ret<<std::endl;
-
-    return ret;
-}
-
-DecodeImp::DecodeImp()
-{
-    av_register_all();
+    
 }
 
 DecodeImp::~DecodeImp()
 {
-    avformat_close_input(&formatContext);
-    av_free(buffer);
-    avio_context_free(&avioContext);
+    av_frame_unref(frame);
+    av_frame_free(&frame);
+
+    av_frame_unref(rgbframe);
+    av_frame_free(&rgbframe);
+
+    av_free_packet(pkt);
+    av_free(pkt);
+
+    // av_free(buffer);
+    sws_freeContext(sws_ctx);
+
+    avcodec_close(Decodec_ctx);
+
+    avcodec_free_context(&Decodec_ctx);
+
+    std::fclose(RecordFile);
 }
 
-int DecodeImp::Init(int sockfd)
+int DecodeImp::Init()
 {
-    buffer = (uint8_t *)av_malloc(1024);
-    if(!buffer)
+    // buffer = (uint8_t *)av_malloc(4096);
+    // if(!buffer)
+    // {
+    //     std::cout<<"av malloc error"<<std::endl;
+    //     return -1;
+    // }
+
+    sws_ctx = sws_getContext(1920, 1080, AV_PIX_FMT_YUV420P,
+                             1920, 1080, AV_PIX_FMT_RGBA,
+                             0, nullptr, nullptr, nullptr);
+    if(!sws_ctx)
     {
-        std::cout<<"av malloc error"<<std::endl;
+        std::cout<<"sws_getContext"<<std::endl;
         return -1;
     }
 
-    avioContext = avio_alloc_context(
-        buffer, 1024,
-        0,
-        &sockfd,
-        socket_read,
-        NULL,
-        NULL
-    );
-
-    formatContext = avformat_alloc_context();
-    formatContext->pb = avioContext;
-
-    std::cout<<"DecodeImp::Init socket:"<< sockfd<< std::endl;
-    *(SOCKET*)avioContext->opaque = sockfd;
-
-    if (avformat_open_input(&formatContext, NULL, NULL, NULL) < 0) 
-    {
-        std::cout<<"open avformat error"<<std::endl;
-        return -1;
-    }
-
-    // 获取流信息
-    if (avformat_find_stream_info(formatContext, NULL) < 0) 
-    {
-        fprintf(stderr, "Could not find stream information.\n");
-        return -1;
-    }
-
-    video_stream = NULL;
-    for (int i = 0; i < formatContext->nb_streams; i++) 
-    {
-        if (formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) 
-        {
-            video_stream = formatContext->streams[i];
-            break;
-        }
-    }
-
-    if (!video_stream)
-    {
-        fprintf(stderr, "No video stream found\n");
-        return -1;
-    }
-
-    std::cout<<"codec_id:"<<video_stream->codecpar->codec_id<<std::endl;
-
-    codec = avcodec_find_decoder(video_stream->codecpar->codec_id);
-    if (!codec) 
+    codec = avcodec_find_decoder(AV_CODEC_ID_H264);
+    if (!codec)
     {
         fprintf(stderr, "Failed to find codec\n");
         return -1;
     }
 
-    codec_ctx = avcodec_alloc_context3(codec);
-    if (avcodec_parameters_to_context(codec_ctx, video_stream->codecpar) < 0) 
+    parser = av_parser_init(codec->id);
+    if(!parser)
     {
-        fprintf(stderr, "Failed to copy codec parameters\n");
+        std::cout<<"parser init error"<<std::endl;
         return -1;
     }
 
-    if (avcodec_open2(codec_ctx, codec, NULL) < 0) 
+    Decodec_ctx = avcodec_alloc_context3(codec);
+
+    if (avcodec_open2(Decodec_ctx, codec, NULL) < 0)
     {
         fprintf(stderr, "Failed to open codec\n");
         return -1;
@@ -125,27 +90,97 @@ int DecodeImp::Init(int sockfd)
         return -1;
     }
 
+    rgbframe = av_frame_alloc();
+    if(!rgbframe)
+    {
+        std::cout<<"alloc rgbframe error"<<std::endl;
+        return -1;
+    }
+
+    rgbframe->width =  1920;
+    rgbframe->height = 1080;
+    rgbframe->format = AV_PIX_FMT_RGBA;
+
+    int ret = av_frame_get_buffer(rgbframe, 0);
+    if(ret < 0)
+    {
+        std::cout<<"av_frame_get_buffer error"<<std::endl;
+        return -1;
+    }
+
+    RecordFile = std::fopen(RecordFileName.c_str(),"w+");
+    if(!RecordFile)
+    {
+        std::cout<<"open output file error"<<std::endl;
+        return -1;
+    }
+
     return 0;
 }
 
-void DecodeImp::HandlerFrameToDecode()
+void DecodeImp::DecodeHandlerFrame(uint8_t *data, int data_size)
 {
     int ret = 0;
+    uint8_t *dataPoint = data;
 
-    while ((ret = av_read_frame(formatContext, pkt)) >= 0) 
+    while (data_size > 0)
     {
-        if (pkt->stream_index == video_stream->index)
+        // std::cout<<"111"<<std::endl;
+        ret = av_parser_parse2(parser, Decodec_ctx, &pkt->data, &pkt->size,
+                               dataPoint, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+
+        // std::cout << "pkt->size:" << pkt->size << " ret:" << ret << std::endl;
+
+        dataPoint += ret;
+        data_size -= ret;
+
+        if (pkt->size)
+            DoDecode();
+    }
+}
+
+int DecodeImp::DoDecode()
+{
+    // std::cout<<"DoDecode"<<std::endl;
+    int ret = avcodec_send_packet(Decodec_ctx, pkt);
+    if(ret < 0)
+    {
+        std::cout<<"send packet error"<<std::endl;
+        return -1;
+    }
+
+    while (ret >= 0)
+    {
+        ret = avcodec_receive_frame(Decodec_ctx, frame);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
         {
-            // 处理 packet
-            // 例如，使用 avcodec_send_packet 将 packet 发送到解码器
-            std::cout << "packet:" << pkt->size << std::endl;
-            // 释放 packet 中的数据，避免内存泄漏
+            // std::cout<<"recv frame error"<<std::endl;
+            return -1;
         }
-        av_packet_unref(pkt);
+        else if (ret < 0)
+        {
+            std::cout<<"decode error"<<std::endl;
+            return -1;
+        }
+        else
+        {
+            int ret = sws_scale(sws_ctx, frame->data, frame->linesize, 0,
+                      frame->height, rgbframe->data, rgbframe->linesize);
+
+            if(ret < 0)
+            {
+                std::cout<<"sws_scale error"<<std::endl;
+            }
+            else
+            {
+                if(RecordFile)
+                    std::fwrite(rgbframe->data[0], rgbframe->width*rgbframe->height*4, 1, RecordFile);
+                
+                //todo
+            }
+
+        }
     }
 
-    if (ret < 0 && ret != AVERROR_EOF) 
-    {
-        std::cout<<"read eol"<<std::endl;
-    }
+    return 0;
 }

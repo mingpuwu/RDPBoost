@@ -4,6 +4,7 @@
 #include "RemoteMap.h"
 #include "ui_remotemap.h"
 #include "Frameplayer.h"
+#include "EnCodeImp.h"
 
 #include <QVBoxLayout>
 #include <QWidget>
@@ -23,6 +24,7 @@ extern "C" {
 #include <memory>
 #include <fstream>
 
+static int ScreenCaptureRunFlag = 0;
 
 static void ScreenCaptureThreadHandler(FramePlayer* arg)
 {
@@ -35,7 +37,9 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
 
     std::cout<<"ScreenCaptureThreadHandler start"<<std::endl;
 
-    CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(FALSE);
+    CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(false);
+    EnCodeImp* EncodeImpI = new EnCodeImp();
+    EncodeImpI->Init();
     TDxgiAdapterOutput out = impl->get(L"");
     BOOL bRet = impl->InitDxgiCapture(out);
     if (!bRet)
@@ -52,7 +56,9 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
     std::ofstream outfile("testrawencode.video",std::ios::binary);
     #endif
 
-    while (true)
+    uint8_t* pBitsCopy = new uint8_t[1920*1080*4];
+
+    while (ScreenCaptureRunFlag)
     {
         pVideoTexture = NULL;
         pVideoData = NULL;
@@ -72,16 +78,20 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
                 int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
                 int pitch = nWidthPicth; // 行字节数
 
-                #ifdef DEBUG_BUILD
-                // outfile.write(pVideoData, );
-                #endif
                 uint8_t* pBits = reinterpret_cast<uint8_t*>(pVideoData);
-                ViewFrame frame(width, height, 30, pBits, AV_PIX_FMT_RGBA);
-                Player->setFrame(frame);
+                // uint8_t pBitsCopy[width*height*bytesPerPixel];
+                memcpy(pBitsCopy, pBits, width*height*bytesPerPixel);
+                #ifdef DEBUG
+                // EncodeImpI->SendFrameToCodec(pBitsCopy, width, height);
+                outfile.write(pBits, width*bytesPerPixel*height);
+                #endif
+                //ViewFrame frame(width, height, 30, pBits, AV_PIX_FMT_RGBA);
+                //Player->setFrame(frame);
                 // // pVideoData 已经指向了 mappedRect.pBits
                 // uint8_t* pBits = reinterpret_cast<uint8_t*>(pVideoData);
 
                 // SaveBitmap("output.bmp", pBits, width, height, bytesPerPixel, pitch,true);
+                // printf("%p\r\n",impl);
                 impl->ReleaseFrame();
                 // break;
             }
@@ -100,6 +110,13 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
         Sleep(50);
     }
 
+    std::cout<<"ScreenCapture thread stop"<<std::endl;
+
+    #ifdef DEBUG
+    outfile.flush();
+    outfile.close();
+    #endif
+
     impl->UnInitDxgiCapture();
     return;
 }
@@ -116,7 +133,7 @@ VideoWidget::~VideoWidget()
 
 void VideoWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    qDebug() << "VideoWidget Mouse is at:" << event->pos();
+    // qDebug() << "VideoWidget Mouse is at:" << event->pos();
 
     // 调用基类的 mouseMoveEvent 来确保正常的事件处理不被阻断
     QVideoWidget::mouseMoveEvent(event);
@@ -125,9 +142,16 @@ void VideoWidget::mouseMoveEvent(QMouseEvent *event)
 void RemoteMap::StartScreenCapture(FramePlayer* Player)
 {
     std::cout<<"start capture screen"<<std::endl;
+    ScreenCaptureRunFlag = 1;
 
     std::thread ScreenCaptureThread(ScreenCaptureThreadHandler, Player);
     ScreenCaptureThread.detach();
+}
+
+void RemoteMap::StopScreenCapture()
+{
+    std::cout<<"stop screen"<<std::endl;
+    ScreenCaptureRunFlag = 0;
 }
 
 RemoteMap::RemoteMap(QWidget *parent)
@@ -152,6 +176,7 @@ RemoteMap::RemoteMap(QWidget *parent)
     this->setLayout(layout);
 
     frmaePlayerInstance->play(500);
+
     //采集视频数据
     this->StartScreenCapture(frmaePlayerInstance);
 
@@ -170,6 +195,9 @@ RemoteMap::RemoteMap(QWidget *parent)
 
 RemoteMap::~RemoteMap()
 {
+    std::cout<<"!!!!!!!!!!!!"<<std::endl;
+    StopScreenCapture();
+
     delete ui;
 }
 
@@ -180,6 +208,7 @@ void RemoteMap::closeEvent(QCloseEvent *event)
 
     //RemCPoint->DisConnect();
     delete RemCPoint;
+    StopScreenCapture();
     // 如果你想阻止窗口关闭，可以调用以下方法
     // event->ignore();
 
@@ -196,7 +225,7 @@ void RemoteMap::mouseMoveEvent(QMouseEvent *event)
     // 'event' 参数包含了鼠标事件的详细信息
 
     // 打印鼠标当前位置的坐标
-    qDebug() << "Mouse is at:" << event->pos();
+    // qDebug() << "Mouse is at:" << event->pos();
 
     std::shared_ptr<RemoteMessage> message = std::make_shared<RemoteMouseMessage>();
     RemCPoint->SendMessage(message);

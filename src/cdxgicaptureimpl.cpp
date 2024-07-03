@@ -162,7 +162,7 @@ BOOL CDxgiCaptureImpl::CreateD3D11Texture()
     D3D11_TEXTURE2D_DESC desc = {0};
     m_nScreenHeight = desc.Height = outdupldesc.ModeDesc.Height;
     desc.Format = outdupldesc.ModeDesc.Format;
-    std::cout << "format:" << desc.Format << std::endl;
+    // std::cout << "format:" << desc.Format << std::endl;
     m_nScreenWidth = desc.Width = outdupldesc.ModeDesc.Width;
     desc.SampleDesc.Count = 1;
     desc.MipLevels = 1;

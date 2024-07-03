@@ -1,34 +1,41 @@
-#ifndef DECODEIMP_HPP
-#define DECODEIMP_HPP
+#ifndef DECODEIMP_H
+#define DECODEIMP_H
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
-#include <libavutil/avutil.h>
+#include <libavcodec/packet.h>
 }
 #include <cstdint>
+#include <cstdlib>
+#include <string>
 
 class DecodeImp
 {
 public:
     DecodeImp();
+
     ~DecodeImp();
 
-    int Init(int sockfd);
+    int Init();
 
-    void HandlerFrameToDecode();
+    void DecodeHandlerFrame(uint8_t *data, int data_size);
 private:
-    int test;
-    uint8_t *buffer;
-    AVFormatContext *formatContext;
-    AVCodecContext *codec_ctx;
-    AVCodec *codec;
-    AVPacket *pkt;
-    AVFrame *frame;
-    AVIOContext *avioContext;
-    AVStream *video_stream;
-};
+    int DoDecode();
 
+private:
+    AVCodecContext *Decodec_ctx = NULL;
+    AVCodec *codec = NULL;
+    AVCodecParserContext *parser = NULL;
+    struct SwsContext *sws_ctx = NULL;
+
+    AVFrame *frame = NULL;
+    AVFrame *rgbframe = NULL;
+    AVPacket *pkt = NULL;
+
+    std::string RecordFileName;
+    FILE* RecordFile;
+};
 
 #endif

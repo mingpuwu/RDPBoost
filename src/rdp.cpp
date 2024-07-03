@@ -51,7 +51,7 @@ void RdpSubWindows::mouseMoveEvent(QMouseEvent *event)
     // 'event' 参数包含了鼠标事件的详细信息
 
     // 打印鼠标当前位置的坐标
-    qDebug() << "Mouse is at:" << event->pos();
+    // qDebug() << "Mouse is at:" << event->pos();
 
     std::shared_ptr<RemoteMessage> message = std::make_shared<RemoteMouseMessage>();
     RemCPoint->SendMessage(message);

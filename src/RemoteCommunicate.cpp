@@ -24,6 +24,7 @@ RemoteCommunicate::RemoteCommunicate(WorkMode mode) : workmode(mode), State(RCSt
     CommunicateThreadStart();
     NetThreadStart();
     DecodeImpInstance = new DecodeImp();
+    DecodeImpInstance->Init();
 }
 
 RemoteCommunicate::~RemoteCommunicate()
@@ -93,7 +94,7 @@ SOCKET RemoteCommunicate::GetSocket()
 
 bool RemoteCommunicate::SendMessage(std::shared_ptr<RemoteMessage> message)
 {
-    std::cout << "push message to list back" << std::endl;
+    // std::cout << "push message to list back" << std::endl;
     std::unique_lock<std::mutex> lc(this->MessageListMutex);
     this->SendMessageList.push_back(message);
     this->cv.notify_all();
@@ -153,23 +154,22 @@ void RemoteCommunicate::ProcessMessage()
     }
 
     // 接收服务器的响应
-    DecodeImpInstance->HandlerFrameToDecode();
-    // char buffer[1024];
-    // int bytes_received = recv(client_socket, buffer, 1024, 0);
-    // if (bytes_received == SOCKET_ERROR)
-    // {
-    //     std::cout << "Receiving failed, close socket" << std::endl;
-    //     closesocket(client_socket);
-    //     client_socket = -1;
-    //     std::cout<<"go to RC_STATE_CLOSED"<<std::endl;
-    //     this->State = RCState::RC_STATE_CLOSED;
-    //     return;
-    // }
-    // else
-    // {
-    //     std::cout << "recv server message :" << bytes_received << std::endl;
-
-    // }
+    char buffer[1024];
+    int bytes_received = recv(client_socket, buffer, 1024, 0);
+    if (bytes_received == SOCKET_ERROR)
+    {
+        std::cout << "Receiving failed, close socket" << std::endl;
+        closesocket(client_socket);
+        client_socket = -1;
+        std::cout<<"go to RC_STATE_CLOSED"<<std::endl;
+        this->State = RCState::RC_STATE_CLOSED;
+        return;
+    }
+    else
+    {
+        std::cout << "recv server message :" << bytes_received << std::endl;
+        DecodeImpInstance->HandlerFrameToDecode(reinterpret_cast<uint8_t*>(buffer), bytes_received);
+    }
 }
 
 void RemoteCommunicate::NetMachineState()
@@ -197,7 +197,7 @@ void RemoteCommunicate::NetMachineState()
         if (Connect("testid", ConnectCallBackHandler))
         {
             std::cout<<"go to RC_STATE_READY state"<<std::endl;
-            DecodeImpInstance->Init(GetSocket());
+            // DecodeImpInstance->Init();
             this->State = RCState::RC_STATE_READY;
         }
         else

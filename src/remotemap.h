@@ -32,6 +32,8 @@ public:
 
     void StartScreenCapture(FramePlayer* Player);
 
+    void StopScreenCapture();
+
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 
