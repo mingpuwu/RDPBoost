@@ -8,7 +8,9 @@ public:
 
     bool Init();
 
-    bool Start();
+    void StartScreenCapture();
+
+    void StopScreenCapture();
 
 private:
     void ScreenCapture();

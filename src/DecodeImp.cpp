@@ -1,5 +1,5 @@
 #include "DecodeImp.h"
-#include "RemoteCommunicate.h"
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>

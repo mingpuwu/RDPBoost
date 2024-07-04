@@ -58,12 +58,13 @@ MainWindow::MainWindow(QWidget *parent)
     QPixmap m_pic = icon.pixmap(icon.actualSize(QSize(10, 10)));
     ui->label_11->setPixmap(m_pic);
     
-    Server ServerInstance;
-    ServerInstance.Start();
+    ServerInstance = new Server();
+    // ServerInstance->StartScreenCapture();
 }
 
 MainWindow::~MainWindow()
 {
+    ServerInstance->stopScreenCapture();
     delete ui;
 }
 

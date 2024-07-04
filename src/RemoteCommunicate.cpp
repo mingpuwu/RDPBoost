@@ -21,9 +21,14 @@ static int ConnectCallBackHandler(bool status)
 
 RemoteCommunicate::RemoteCommunicate(WorkMode mode) : workmode(mode), State(RCState::RC_STATE_INIT)
 {
-    CommunicateThreadStart();
-    NetThreadStart();
+    std::cout<<"RemoteCommunicate Create"<<std::endl;
+    
+    this->CommunicateThreadStart();
+
+    this->NetThreadStart();
+
     DecodeImpInstance = new DecodeImp();
+
     if(DecodeImpInstance->Init() < 0)
     {
         std::cout<<"DecodeImp init error"<<std::endl;
@@ -134,11 +139,12 @@ bool RemoteCommunicate::NetThreadStart()
     std::cout << "NetThreadStart" << std::endl;
 
     NetWorker = std::thread([this]
-                            {
+    {
         while(1)
         {
             NetMachineState();
-        } });
+        } 
+    });
 
     NetWorker.detach();
 

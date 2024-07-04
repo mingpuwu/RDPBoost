@@ -28,11 +28,8 @@ class RemoteMap : public QWidget
 
 public:
     explicit RemoteMap(QWidget *parent = nullptr);
+
     ~RemoteMap();
-
-    void StartScreenCapture(FramePlayer* Player);
-
-    void StopScreenCapture();
 
 protected:
     void mouseMoveEvent(QMouseEvent *event) override;

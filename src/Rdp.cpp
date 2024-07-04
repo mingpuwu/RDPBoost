@@ -14,11 +14,11 @@ RdpSubWindows::RdpSubWindows(QWidget *parent)
     // QVBoxLayout *layout = new QVBoxLayout(this);
     // layout->addWidget(imageLabel);
     // setLayout(layout);
-    RemCPoint = new RemoteCommunicate(WorkMode::WORK_MODE_CLIENT);
-    if (RemCPoint == nullptr)
-    {
-        std::cout << "make shared remotecommunicate error" << std::endl;
-    }
+    // RemCPoint = new RemoteCommunicate(WorkMode::WORK_MODE_CLIENT);
+    // if (RemCPoint == nullptr)
+    // {
+    //     std::cout << "make shared remotecommunicate error" << std::endl;
+    // }
 
     this->resize(800, 600);
 }
