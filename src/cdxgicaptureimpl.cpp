@@ -330,7 +330,7 @@ void CDxgiCaptureImpl::UnInitDxgiCapture()
     SAFE_RELEASE(m_pDeskDupl);
     SAFE_RELEASE(m_pD3D11Device);
     SAFE_RELEASE(m_pD3D11Context);
-    SAFE_RELEASE(m_pShareTexture);
+    // SAFE_RELEASE(m_pShareTexture);
     SAFE_RELEASE(m_pCpuTexture);
     m_hShareHanle = NULL;
 }

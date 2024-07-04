@@ -10,7 +10,7 @@ extern "C"
 #include <iostream>
 #include <fstream>
 
-#define TESTH264FILE "../TestH264Record.video"
+#define TESTH264FILE "TestH264Record.video"
 
 EnCodeImp::EnCodeImp():RecordH264FileName(TESTH264FILE)
 {
@@ -116,6 +116,8 @@ int EnCodeImp::HandlerFrameToEncode(uint8_t *data, int size)
     frame->pts = count;
 
     DoEncode();
+
+    return 0;
 }
 
 void EnCodeImp::DoEncode()

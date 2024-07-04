@@ -1,4 +1,5 @@
 #include "DecodeImp.h"
+#include "RemoteCommunicate.h"
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -8,7 +9,7 @@ extern "C" {
 }
 #include <iostream>
 
-#define TESTRECORDFILE "../RecordRgba.raw"
+#define TESTRECORDFILE "RecordRgba.raw"
 
 DecodeImp::DecodeImp():RecordFileName(TESTRECORDFILE)
 {
@@ -38,13 +39,6 @@ DecodeImp::~DecodeImp()
 
 int DecodeImp::Init()
 {
-    // buffer = (uint8_t *)av_malloc(4096);
-    // if(!buffer)
-    // {
-    //     std::cout<<"av malloc error"<<std::endl;
-    //     return -1;
-    // }
-
     sws_ctx = sws_getContext(1920, 1080, AV_PIX_FMT_YUV420P,
                              1920, 1080, AV_PIX_FMT_RGBA,
                              0, nullptr, nullptr, nullptr);
@@ -118,14 +112,13 @@ int DecodeImp::Init()
     return 0;
 }
 
-void DecodeImp::DecodeHandlerFrame(uint8_t *data, int data_size)
+void DecodeImp::DecodeHandlerFrame(uint8_t *data, int data_size, PlayCallBack cb)
 {
     int ret = 0;
     uint8_t *dataPoint = data;
 
     while (data_size > 0)
     {
-        // std::cout<<"111"<<std::endl;
         ret = av_parser_parse2(parser, Decodec_ctx, &pkt->data, &pkt->size,
                                dataPoint, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 
@@ -135,11 +128,11 @@ void DecodeImp::DecodeHandlerFrame(uint8_t *data, int data_size)
         data_size -= ret;
 
         if (pkt->size)
-            DoDecode();
+            DoDecode(cb);
     }
 }
 
-int DecodeImp::DoDecode()
+int DecodeImp::DoDecode(PlayCallBack cb)
 {
     // std::cout<<"DoDecode"<<std::endl;
     int ret = avcodec_send_packet(Decodec_ctx, pkt);
@@ -165,7 +158,7 @@ int DecodeImp::DoDecode()
         else
         {
             int ret = sws_scale(sws_ctx, frame->data, frame->linesize, 0,
-                      frame->height, rgbframe->data, rgbframe->linesize);
+                                frame->height, rgbframe->data, rgbframe->linesize);
 
             if(ret < 0)
             {
@@ -173,10 +166,12 @@ int DecodeImp::DoDecode()
             }
             else
             {
+                std::cout<<"Decode success"<<std::endl;
                 if(RecordFile)
                     std::fwrite(rgbframe->data[0], rgbframe->width*rgbframe->height*4, 1, RecordFile);
                 
                 //todo
+                cb(rgbframe->data[0], rgbframe->width*rgbframe->height*4);
             }
 
         }

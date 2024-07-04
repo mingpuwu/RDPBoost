@@ -17,6 +17,8 @@ using std::string;
 
 using ConnectCallBack = std::function<int(bool)>;
 
+using PlayCallBack = std::function<void(uint8_t*,int)>;
+
 enum class WorkMode
 {
     WORK_MODE_CLIENT = 0,
@@ -43,6 +45,8 @@ public:
     bool SendMessage(std::shared_ptr<RemoteMessage> message);
 
     SOCKET GetSocket();
+
+    void SetPlayCallBack(PlayCallBack cb);
 
 private:
     bool CommunicateThreadStart();
@@ -72,5 +76,7 @@ private:
     WorkMode workmode;
 
     DecodeImp* DecodeImpInstance;
+
+    PlayCallBack PlayCallBackFunction;
 };
 #endif // REMOTECOMMUNICATE_H

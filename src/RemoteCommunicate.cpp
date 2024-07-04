@@ -24,7 +24,10 @@ RemoteCommunicate::RemoteCommunicate(WorkMode mode) : workmode(mode), State(RCSt
     CommunicateThreadStart();
     NetThreadStart();
     DecodeImpInstance = new DecodeImp();
-    DecodeImpInstance->Init();
+    if(DecodeImpInstance->Init() < 0)
+    {
+        std::cout<<"DecodeImp init error"<<std::endl;
+    }
 }
 
 RemoteCommunicate::~RemoteCommunicate()
@@ -144,18 +147,19 @@ bool RemoteCommunicate::NetThreadStart()
 
 void RemoteCommunicate::ProcessMessage()
 {
-    const char *message = "Hello, server!";
-    if (send(client_socket, message, strlen(message), 0) == SOCKET_ERROR)
-    {
-        closesocket(client_socket);
-        client_socket = -1;
-        this->State = RCState::RC_STATE_CONNECTING;
-        return;
-    }
+    // const char *message = "Hello, server!";
+    // if (send(client_socket, message, strlen(message), 0) == SOCKET_ERROR)
+    // {
+    //     std::cout<<"send socket return error"<<std::endl;
+    //     closesocket(client_socket);
+    //     client_socket = -1;
+    //     this->State = RCState::RC_STATE_CLOSED;
+    //     return;
+    // }
 
     // 接收服务器的响应
-    char buffer[1024];
-    int bytes_received = recv(client_socket, buffer, 1024, 0);
+    char buffer[4096];
+    int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
     if (bytes_received == SOCKET_ERROR)
     {
         std::cout << "Receiving failed, close socket" << std::endl;
@@ -167,8 +171,8 @@ void RemoteCommunicate::ProcessMessage()
     }
     else
     {
-        std::cout << "recv server message :" << bytes_received << std::endl;
-        DecodeImpInstance->HandlerFrameToDecode(reinterpret_cast<uint8_t*>(buffer), bytes_received);
+        // std::cout << "recv server message :" << bytes_received << std::endl;
+        DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t*>(buffer), bytes_received, PlayCallBackFunction);
     }
 }
 
@@ -216,4 +220,9 @@ void RemoteCommunicate::NetMachineState()
     default:
         break;
     }
+}
+
+void RemoteCommunicate::SetPlayCallBack(PlayCallBack cb)
+{
+    PlayCallBackFunction = cb;
 }

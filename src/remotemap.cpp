@@ -26,20 +26,24 @@ extern "C" {
 
 static int ScreenCaptureRunFlag = 0;
 
-static void ScreenCaptureThreadHandler(FramePlayer* arg)
+static void ScreenCaptureThreadHandler(void* arg)
 {
-    FramePlayer* Player = dynamic_cast<FramePlayer*>(arg);
-    if(!Player)
-    {
-        std::cout<<"dynamic cast error"<<std::endl;
-        return;
-    }
+    // FramePlayer* Player = dynamic_cast<FramePlayer*>(arg);
+    // if(!Player)
+    // {
+    //     std::cout<<"dynamic cast error"<<std::endl;
+    //     return;
+    // }
 
     std::cout<<"ScreenCaptureThreadHandler start"<<std::endl;
 
     CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(false);
     EnCodeImp* EncodeImpI = new EnCodeImp();
-    EncodeImpI->Init();
+    if(EncodeImpI->Init() < 0)
+    {
+        std::cout<<"encode init error"<<std::endl;
+        return;
+    }
     TDxgiAdapterOutput out = impl->get(L"");
     BOOL bRet = impl->InitDxgiCapture(out);
     if (!bRet)
@@ -53,7 +57,7 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
     ID3D11Texture2D *pVideoTexture = NULL;
 
     #ifdef DEBUG
-    std::ofstream outfile("testrawencode.video",std::ios::binary);
+    std::ofstream outfile("TestRawCap.video",std::ios::binary);
     #endif
 
     uint8_t* pBitsCopy = new uint8_t[1920*1080*4];
@@ -79,28 +83,18 @@ static void ScreenCaptureThreadHandler(FramePlayer* arg)
                 int pitch = nWidthPicth; // 行字节数
 
                 uint8_t* pBits = reinterpret_cast<uint8_t*>(pVideoData);
-                // uint8_t pBitsCopy[width*height*bytesPerPixel];
-                memcpy(pBitsCopy, pBits, width*height*bytesPerPixel);
+
                 #ifdef DEBUG
                 // EncodeImpI->SendFrameToCodec(pBitsCopy, width, height);
-                outfile.write(pBits, width*bytesPerPixel*height);
+                outfile.write(reinterpret_cast<char*>(pBits), width*bytesPerPixel*height);
                 #endif
-                //ViewFrame frame(width, height, 30, pBits, AV_PIX_FMT_RGBA);
-                //Player->setFrame(frame);
-                // // pVideoData 已经指向了 mappedRect.pBits
-                // uint8_t* pBits = reinterpret_cast<uint8_t*>(pVideoData);
-
-                // SaveBitmap("output.bmp", pBits, width, height, bytesPerPixel, pitch,true);
-                // printf("%p\r\n",impl);
+                EncodeImpI->HandlerFrameToEncode(pBits, width*bytesPerPixel*height);
                 impl->ReleaseFrame();
-                // break;
             }
             else
             {
                 // std::cout << "capture timeout\n";
             }
-            //成功捕获一帧
-
         }
         else
         {
@@ -144,7 +138,7 @@ void RemoteMap::StartScreenCapture(FramePlayer* Player)
     std::cout<<"start capture screen"<<std::endl;
     ScreenCaptureRunFlag = 1;
 
-    std::thread ScreenCaptureThread(ScreenCaptureThreadHandler, Player);
+    std::thread ScreenCaptureThread(ScreenCaptureThreadHandler, nullptr);
     ScreenCaptureThread.detach();
 }
 
@@ -170,12 +164,15 @@ RemoteMap::RemoteMap(QWidget *parent)
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    FramePlayer* frmaePlayerInstance = new FramePlayer(this);
-    frmaePlayerInstance->setObjectName("video_play");
-    layout->addWidget(frmaePlayerInstance); // 添加到布局中，子控件会自动扩展填满空间
+    FramePlayer* framePlayerInstance = new FramePlayer(this);
+    framePlayerInstance->setObjectName("video_play");
+    layout->addWidget(framePlayerInstance); // 添加到布局中，子控件会自动扩展填满空间
     this->setLayout(layout);
 
-    frmaePlayerInstance->play(500);
+    framePlayerInstance->play(500);
+
+    auto callback = [&framePlayerInstance]
+    RemCPoint->SetPlayCallBack();
 
     //采集视频数据
     this->StartScreenCapture(frmaePlayerInstance);

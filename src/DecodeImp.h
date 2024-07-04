@@ -1,5 +1,6 @@
 #ifndef DECODEIMP_H
 #define DECODEIMP_H
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -10,6 +11,9 @@ extern "C" {
 #include <cstdint>
 #include <cstdlib>
 #include <string>
+#include <functional>
+
+using PlayCallBack = std::function<void(uint8_t*,int)>;
 
 class DecodeImp
 {
@@ -20,9 +24,9 @@ public:
 
     int Init();
 
-    void DecodeHandlerFrame(uint8_t *data, int data_size);
+    void DecodeHandlerFrame(uint8_t *data, int data_size, PlayCallBack cb);
 private:
-    int DoDecode();
+    int DoDecode(PlayCallBack cb);
 
 private:
     AVCodecContext *Decodec_ctx = NULL;
@@ -36,6 +40,8 @@ private:
 
     std::string RecordFileName;
     FILE* RecordFile;
+
+    // PlayCallBack CallBackFunction;
 };
 
 #endif

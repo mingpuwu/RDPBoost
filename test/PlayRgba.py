@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import sys
 
 # 图像的尺寸
 width = 1920  # 假设宽度为 640 像素
@@ -9,9 +10,9 @@ height = 1080  # 假设高度为 480 像素
 data_size = width * height * 4  # RGBA 格式，每个像素 4 个字节
 
 # 打开文件并读取数据
-file = 'video.raw'
-file = 'RecordRgba.raw'
+file = sys.argv[1]
 print('open file:',file)
+
 with open(file, 'rb') as file:
     while(1):
         rgba_data = file.read(data_size)

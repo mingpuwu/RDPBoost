@@ -54,6 +54,7 @@ public:
     void stop();
     bool isPlaying();
     void setFrame(ViewFrame &frame);
+    void setFrame2(uint8_t* data, int size);
     State getState();
 
 signals:

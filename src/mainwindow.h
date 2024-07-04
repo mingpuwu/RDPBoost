@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMouseEvent>
+#include "RemoteMap.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,5 +24,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    RemoteMap* Rmap;
 };
 #endif // MAINWINDOW_H

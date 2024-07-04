@@ -1,9 +1,10 @@
 import cv2
+import sys
 
 # 解码数据后直接展示
 
-file = 'output.h264'
-file = 'TestH264Record.video'
+file = sys.argv[1]
+
 def main():
     # 打开H.264格式视频文件
     print('open file:',file)

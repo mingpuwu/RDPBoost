@@ -72,7 +72,7 @@ void MainWindow::on_pushButton_clicked()
     QString connectId = ui->lineEdit->text();
     std::cout<<"connect:"<<connectId.toStdString()<<std::endl;
 
-    RemoteMap *rdp = new RemoteMap();
-    rdp->setMouseTracking(true);
-    rdp->show();
+    Rmap = new RemoteMap();
+    Rmap->setMouseTracking(true);
+    Rmap->show();
 }
