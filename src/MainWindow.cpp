@@ -59,12 +59,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_11->setPixmap(m_pic);
     
     ServerInstance = new Server();
-    // ServerInstance->StartScreenCapture();
+    //ServerInstance->StartScreenCapture();
 }
 
 MainWindow::~MainWindow()
 {
-    ServerInstance->stopScreenCapture();
+    ServerInstance->StopScreenCapture();
     delete ui;
 }
 

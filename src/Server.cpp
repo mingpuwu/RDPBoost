@@ -1,6 +1,9 @@
 #include "Server.h"
+#include "CdxgiCaptureImpl.h"
+#include "EnCodeImp.h"
 #include <iostream>
 #include <fstream>
+#include <thread>
 #include <Windows.h>
 
 static int ScreenCaptureRunFlag = 0;

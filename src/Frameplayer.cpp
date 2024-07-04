@@ -92,7 +92,7 @@ void FramePlayer::setFrame(ViewFrame &Frame)
     }
 }
 
-static void FramePlayer::setFrame2(uint8_t* data, int size)
+void FramePlayer::setFrame2(uint8_t* data, int size)
 {
     ViewFrame FrameI(1920,1080,30,data,AV_PIX_FMT_RGBA);
     setFrame(FrameI);

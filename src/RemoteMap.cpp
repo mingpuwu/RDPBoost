@@ -1,10 +1,8 @@
 #include "RemoteCommunicate.h"
-#include "CDxgiCaptureImpl.h"
 #include "Frameplayer.h"
 #include "RemoteMap.h"
 #include "ui_remotemap.h"
 #include "Frameplayer.h"
-#include "EnCodeImp.h"
 
 #include <QVBoxLayout>
 #include <QWidget>
@@ -22,7 +20,6 @@ extern "C" {
 }
 #include <iostream>
 #include <memory>
-#include <fstream>
 
 VideoWidget::VideoWidget(QWidget *parent): QVideoWidget(parent)
 {
@@ -83,7 +80,6 @@ RemoteMap::RemoteMap(QWidget *parent)
 RemoteMap::~RemoteMap()
 {
     std::cout<<"!!!!!!!!!!!!"<<std::endl;
-    StopScreenCapture();
 
     delete ui;
 }

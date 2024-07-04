@@ -9,7 +9,7 @@ extern "C" {
 }
 #include <iostream>
 
-#define TESTRECORDFILE "RecordRgba.raw"
+#define TESTRECORDFILE "TestRecordRgba.raw"
 
 DecodeImp::DecodeImp():RecordFileName(TESTRECORDFILE)
 {
@@ -168,14 +168,23 @@ int DecodeImp::DoDecode(PlayCallBack cb)
             {
                 std::cout<<"Decode success"<<std::endl;
                 if(RecordFile)
+                {
                     std::fwrite(rgbframe->data[0], rgbframe->width*rgbframe->height*4, 1, RecordFile);
-                
+                }
                 //todo
-                cb(rgbframe->data[0], rgbframe->width*rgbframe->height*4);
+                if(cb)
+                    cb(rgbframe->data[0], rgbframe->width*rgbframe->height*4);
             }
 
         }
     }
 
     return 0;
+}
+
+void DecodeImp::CloseRecored()
+{
+    std::fflush(RecordFile);
+    std::fclose(RecordFile);
+    RecordFile = nullptr;
 }

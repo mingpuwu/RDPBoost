@@ -166,13 +166,14 @@ void RemoteCommunicate::ProcessMessage()
     // 接收服务器的响应
     char buffer[4096];
     int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
-    if (bytes_received == SOCKET_ERROR)
+    if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
-        std::cout << "Receiving failed, close socket" << std::endl;
+        std::cout <<"Receiving failed, close socket" << std::endl;
         closesocket(client_socket);
         client_socket = -1;
         std::cout<<"go to RC_STATE_CLOSED"<<std::endl;
         this->State = RCState::RC_STATE_CLOSED;
+        DecodeImpInstance->CloseRecored();
         return;
     }
     else
@@ -222,6 +223,7 @@ void RemoteCommunicate::NetMachineState()
 
     case RCState::RC_STATE_CLOSED:
         std::this_thread::sleep_for(std::chrono::seconds(1));
+
         break;
     default:
         break;

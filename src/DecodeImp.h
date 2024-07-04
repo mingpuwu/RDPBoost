@@ -25,6 +25,8 @@ public:
     int Init();
 
     void DecodeHandlerFrame(uint8_t *data, int data_size, PlayCallBack cb);
+
+    void CloseRecored();
 private:
     int DoDecode(PlayCallBack cb);
 
