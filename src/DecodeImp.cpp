@@ -24,7 +24,7 @@ DecodeImp::~DecodeImp()
     av_frame_unref(rgbframe);
     av_frame_free(&rgbframe);
 
-    av_free_packet(pkt);
+    // av_free_packet(pkt);
     av_free(pkt);
 
     // av_free(buffer);
@@ -95,14 +95,14 @@ int DecodeImp::Init()
     rgbframe->height = 1080;
     rgbframe->format = AV_PIX_FMT_RGBA;
 
-    int ret = av_frame_get_buffer(rgbframe, 0);
+    int ret = av_frame_get_buffer(rgbframe, 32);
     if(ret < 0)
     {
         std::cout<<"av_frame_get_buffer error"<<std::endl;
         return -1;
     }
 
-    RecordFile = std::fopen(RecordFileName.c_str(),"w+");
+    RecordFile = std::fopen(RecordFileName.c_str(),"wb+");
     if(!RecordFile)
     {
         std::cout<<"open output file error"<<std::endl;
@@ -169,7 +169,7 @@ int DecodeImp::DoDecode(PlayCallBack cb)
                 std::cout<<"Decode success"<<std::endl;
                 if(RecordFile)
                 {
-                    std::fwrite(rgbframe->data[0], rgbframe->width*rgbframe->height*4, 1, RecordFile);
+                    std::fwrite(rgbframe->data[0], rgbframe->linesize[0]*1080, 1, RecordFile);
                 }
                 //todo
                 if(cb)

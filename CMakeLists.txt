@@ -16,8 +16,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
-set(FFMPEG_DLL_DIR "D:/GitCode/RDPBoost/3rdparty/libffmpeg_4_4/lib/x64")
-set(FFMPEG_INC_DIR "D:/GitCode/RDPBoost/3rdparty/libffmpeg_4_4/include")
+set(FFMPEG_DLL_DIR_6_1 "3rdparty/ffmpeg_6_1_1/lib/")
+set(FFMPEG_INC_DIR_6_1 "3rdparty/ffmpeg_6_1_1/include/")
+
+set(FFMPEG_DLL_DIR_4_4 "3rdparty/libffmpeg_4_4/lib/x64/")
+set(FFMPEG_INC_DIR_4_4 "3rdparty/libffmpeg_4_4/include/")
+
+set(FFMPEG_DLL_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_DLL_DIR_6_1}")
+set(FFMPEG_INC_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_INC_DIR_6_1}")
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
@@ -35,17 +41,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET RDPBoost APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+
 else()
     if(ANDROID)
         add_library(RDPBoost SHARED
             ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(RDPBoost
             ${PROJECT_SOURCES}
@@ -78,6 +79,9 @@ set_target_properties(RDPBoost PROPERTIES
 )
 
 include(GNUInstallDirs)
+
+message("CMAKE_INSTALL_LIBDIR!!! ${CMAKE_INSTALL_LIBDIR}")
+
 install(TARGETS RDPBoost
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

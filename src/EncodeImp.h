@@ -27,7 +27,7 @@ private:
     void DoEncode();
 
 private:
-    AVCodec* Encodec = nullptr;
+    const AVCodec* Encodec = nullptr;
     AVCodecContext* codec_context = nullptr;
     AVFrame* frame = nullptr;
     AVFrame* rgba_frame = nullptr;
