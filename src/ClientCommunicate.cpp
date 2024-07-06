@@ -1,4 +1,4 @@
-#include "RemoteCommunicate.h"
+#include "ClientCommunicate.h"
 #include "RemoteProtocol.h"
 #include "DecodeImp.h"
 #include <iostream>

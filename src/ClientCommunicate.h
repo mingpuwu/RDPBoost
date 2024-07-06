@@ -1,5 +1,5 @@
-#ifndef REMOTECOMMUNICATE_H
-#define REMOTECOMMUNICATE_H
+#ifndef CLIENTCOMMUNICATE_H
+#define CLIENTCOMMUNICATE_H
 
 #include "RemoteProtocol.h"
 #include "DecodeImp.h"
@@ -19,7 +19,7 @@ using std::string;
 
 using ConnectCallBack = std::function<int(bool)>;
 
-using MessageRecvCallBack = std::function<void(uint8_t*,int)>;
+using MessageRecvCallBack = std::function<void(uint8_t *, int)>;
 
 enum class RCState
 {
@@ -49,23 +49,10 @@ public:
 
     SOCKET GetSocket();
 
-    void RegisterCallBack(CommunicateMessageType eventType, MessageRecvCallBack callback) 
+    void RegisterCallBack(CommunicateMessageType eventType, MessageRecvCallBack callback)
     {
         CallBackList[eventType] = callback;
     }
-
-    // 使用 Lambda 表达式订阅 SourceClass 的成员函数到 NetworkEvent 类型事件
-    // eventManager.RegisterCallBackByLambda(EventType::NetworkEvent,
-    //     [&src](const NetworkData& data) {
-    //         src.functionToRegister(data); // 使用捕获的引用调用成员函数
-    //     }
-    // );
-    void RegisterCallBackByLambda(CommunicateMessageType eventType, MessageRecvCallBack callback) 
-    {
-        std::cout<<"register callback"<<std::endl;
-
-        CallBackList[eventType] = callback;
-    } 
 
 private:
     bool CommunicateThreadStart();
@@ -92,8 +79,8 @@ private:
 
     SOCKET client_socket;
 
-    DecodeImp* DecodeImpInstance;
+    DecodeImp *DecodeImpInstance;
 
     std::map<CommunicateMessageType, MessageRecvCallBack> CallBackList;
 };
-#endif // REMOTECOMMUNICATE_H
+#endif // CLIENTCOMMUNICATE_H

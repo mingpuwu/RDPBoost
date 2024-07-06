@@ -1,5 +1,5 @@
 #include "rdp.h"
-#include "RemoteCommunicate.h"
+#include "ClientCommunicate.h"
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QLabel>

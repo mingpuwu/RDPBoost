@@ -1,4 +1,4 @@
-#include "RemoteCommunicate.h"
+#include "ClientCommunicate.h"
 #include "Frameplayer.h"
 #include "remotemap.h"
 #include "ui_remotemap.h"
@@ -62,7 +62,7 @@ RemoteMap::RemoteMap(QWidget *parent)
     this->setLayout(layout);
     framePlayerInstance->play(500);
 
-    RemCPoint->RegisterCallBackByLambda(CommunicateMessageType::MESSAGE_TYPE_VIDEO,
+    RemCPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_VIDEO,
                                         [framePlayerInstance](uint8_t* data, int datasize){
                                             framePlayerInstance->setFrame(data,datasize);
                                         }

@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QVideoWidget>
-#include "RemoteCommunicate.h"
+#include "ClientCommunicate.h"
 #include "Frameplayer.h"
 
 namespace Ui {

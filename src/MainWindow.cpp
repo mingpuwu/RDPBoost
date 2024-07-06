@@ -59,7 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_11->setPixmap(m_pic);
     
     ServerInstance = new Server();
-    //ServerInstance->StartScreenCapture();
+    ServerInstance->Init();
+    ServerInstance->StartScreenCapture();
 }
 
 MainWindow::~MainWindow()

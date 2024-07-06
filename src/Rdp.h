@@ -1,6 +1,6 @@
 #ifndef RDP_H
 #define RDP_H
-#include "RemoteCommunicate.h"
+#include "ClientCommunicate.h"
 #include <QWidget>
 #include <QLabel>
 #include <list>

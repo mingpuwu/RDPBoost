@@ -10,17 +10,11 @@ static int ScreenCaptureRunFlag = 0;
 
 static void ScreenCaptureThreadHandler(void* arg)
 {
-    // FramePlayer* Player = dynamic_cast<FramePlayer*>(arg);
-    // if(!Player)
-    // {
-    //     std::cout<<"dynamic cast error"<<std::endl;
-    //     return;
-    // }
-
     std::cout<<"ScreenCaptureThreadHandler start"<<std::endl;
 
     CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(false);
     EnCodeImp* EncodeImpI = new EnCodeImp();
+
     if(EncodeImpI->Init() < 0)
     {
         std::cout<<"encode init error"<<std::endl;
@@ -30,7 +24,7 @@ static void ScreenCaptureThreadHandler(void* arg)
     BOOL bRet = impl->InitDxgiCapture(out);
     if (!bRet)
     {
-        std::cout << " InitDxgiCapture Error \n";
+        std::cout << " InitDxgiCapture Error"<<std::endl;
         return;
     }
 
@@ -54,11 +48,11 @@ static void ScreenCaptureThreadHandler(void* arg)
         {
             if (pVideoTexture)//纹理捕获成功
             {
-                // std::cout << "capture video succuess\n";
+                std::cout << "capture video succuess"<<std::endl;
             }
             else if (nWidthPicth > 0)//视频数据捕获成功  pVideoData就是视频RGBA数据
             {
-                // std::cout << "read raw RGBA data\n";
+                std::cout << "read raw RGBA data"<<std::endl;
                 int width = 1920; // 图像宽度
                 int height = 1080; // 图像高度
                 int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
@@ -70,17 +64,19 @@ static void ScreenCaptureThreadHandler(void* arg)
                 // EncodeImpI->SendFrameToCodec(pBitsCopy, width, height);
                 outfile.write(reinterpret_cast<char*>(pBits), width*bytesPerPixel*height);
                 #endif
+
                 EncodeImpI->HandlerFrameToEncode(pBits, width*bytesPerPixel*height);
+
                 impl->ReleaseFrame();
             }
             else
             {
-                // std::cout << "capture timeout\n";
+                std::cout << "capture timeout"<<std::endl;
             }
         }
         else
         {
-            std::cout << "capture error,continue\n";
+            std::cout << "capture error,continue"<<std::endl;
             // break;
         }
         Sleep(50);

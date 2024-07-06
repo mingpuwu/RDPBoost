@@ -24,7 +24,7 @@ public:
     int HandlerFrameToEncode(uint8_t *data, int size);
 
 private:
-    void DoEncode();
+    void DoEncode(AVFrame* frameI);
 
 private:
     const AVCodec* Encodec = nullptr;

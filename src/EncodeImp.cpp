@@ -5,6 +5,8 @@ extern "C"
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
+#include <libavutil/frame.h>
+#include <libavutil/avutil.h>
 }
 
 #include <iostream>
@@ -111,19 +113,21 @@ int EnCodeImp::HandlerFrameToEncode(uint8_t *data, int size)
     int src_stride[1] = {4 * codec_context->width};
     sws_scale(sws_context, src_slices, src_stride, 0, codec_context->height, frame->data, frame->linesize);
 
+    // int64_t timestamp = av_frame_get_best_effort_timestamp(frame);
+
     count++;
     frame->pts = count;
 
-    DoEncode();
+    DoEncode(frame);
 
     return 0;
 }
 
-void EnCodeImp::DoEncode()
+void EnCodeImp::DoEncode(AVFrame* frameI)
 {
     int ret = 0;
 
-    ret = avcodec_send_frame(codec_context, frame);
+    ret = avcodec_send_frame(codec_context, frameI);
     if (ret < 0)
     {
         fprintf(stderr, "Error sending a frame for encoding\n");
@@ -145,6 +149,7 @@ void EnCodeImp::DoEncode()
             std::fwrite(pkt->data, pkt->size, 1, RecordH264File);
 
         //todo
+        
 
         av_packet_unref(pkt);
     }

@@ -1,6 +1,8 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include "EncodeImp.h"
+
 class Server
 {
 public:
@@ -12,11 +14,13 @@ public:
 
     void StopScreenCapture();
 
+    EnCodeImp* EncodeImpI;
+
 private:
     void ScreenCapture();
 
     bool SendVideoStream();
-
+private:
 };
 
 #endif // SERVER_H
