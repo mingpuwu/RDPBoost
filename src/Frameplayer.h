@@ -45,17 +45,22 @@ public:
     };
 
     explicit FramePlayer(QWidget *parent = nullptr);
+    
     ~FramePlayer();
 
     void SendFrame(ViewFrame *frame);
 
     void play(int interval);
+
     void pause();
+
     void stop();
+
     bool isPlaying();
-    void setFrame(ViewFrame &frame);
-    void setFrame2(uint8_t* data, int size);
-    State getState();
+
+    void SetFrame(uint8_t* data, int size);
+
+    State GetState();
 
 signals:
     void stateChanged();
@@ -74,8 +79,6 @@ private:
     void setState(State state);
     void stopTimer();
     std::mutex MutexLock;
-
-    std::list<ViewFrame*> FrameList;
 };
 
 #endif // FRAMEPLAYER_H

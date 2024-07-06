@@ -166,14 +166,18 @@ int DecodeImp::DoDecode(PlayCallBack cb)
             }
             else
             {
-                std::cout<<"Decode success"<<std::endl;
+                //std::cout<<"Decode success"<<std::endl;
                 if(RecordFile)
                 {
                     std::fwrite(rgbframe->data[0], rgbframe->linesize[0]*1080, 1, RecordFile);
                 }
+                
                 //todo
                 if(cb)
-                    cb(rgbframe->data[0], rgbframe->width*rgbframe->height*4);
+                {
+                    // std::cout<<"call cb"<<std::endl;
+                    cb(rgbframe->data[0], rgbframe->linesize[0]*1080);
+                }
             }
 
         }

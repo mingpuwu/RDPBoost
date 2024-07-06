@@ -14,6 +14,9 @@ extern "C" {
 
 #include <iostream>
 
+uint8_t RbgaFrameBuffer[1920*1080*4];
+
+
 FramePlayer::FramePlayer(QWidget *parent) : QWidget(parent)
 {
     // 初始化代码...
@@ -55,7 +58,7 @@ bool FramePlayer::isPlaying()
     return _state == Playing;
 }
 
-FramePlayer::State FramePlayer::getState()
+FramePlayer::State FramePlayer::GetState()
 {
     return _state;
 }
@@ -72,30 +75,21 @@ void FramePlayer::setState(State state)
     emit stateChanged();
 }
 
-void FramePlayer::setFrame(ViewFrame &Frame)
+void FramePlayer::SetFrame(uint8_t* data, int size)
 {
-    // 打开文件、设置间隔、计算图像大小等...
-    if(Frame.pixelFormat == AV_PIX_FMT_RGBA)
+    // std::cout<<"setFrame" <<std::endl;
+    //if(RbgaFrameBuffer)
     {
-        if(_currentImage)
-        {
-            freeCurrentImage();
-        }
-
-        _currentImage = new QImage(Frame.data, Frame.width,
-                                   Frame.height, Frame.width * 4,
-                                   QImage::Format_RGBA8888); 
+        //need copy;
+        //std::cout << "data Address: " << static_cast<void*>(data) << std::endl;
+        //std::cout << "Frame Buffer Address: " << static_cast<void*>(RbgaFrameBuffer) << std::endl;
+        //qDebug() << RbgaFrameBuffer;
+        memcpy(&RbgaFrameBuffer[0], data, size);
     }
-    else
-    {
-        std::cout<<"frame foramt error"<<std::endl;
-    }
-}
-
-void FramePlayer::setFrame2(uint8_t* data, int size)
-{
-    ViewFrame FrameI(1920,1080,30,data,AV_PIX_FMT_RGBA);
-    setFrame(FrameI);
+    // else
+    // {
+    //     std::cout<<"RbgaFrameBuffer is free"<<std::endl;
+    // }
 }
 
 void FramePlayer::SendFrame(ViewFrame *frame)
@@ -105,22 +99,25 @@ void FramePlayer::SendFrame(ViewFrame *frame)
 
 void FramePlayer::timerEvent(QTimerEvent *event)
 {
+    std::cout<<"update1...."<<std::endl;
     if (event->timerId() == this->_timerId)
     {
-        // std::cout<<"update...."<<std::endl;
+        std::cout<<"update...."<<std::endl;
         update();
     }
 }
 
 void FramePlayer::paintEvent(QPaintEvent *event)
 {
-    if (_currentImage)
-    {
-        // std::cout<<"paintEvent"<<std::endl;
-        // qDebug() << "Image size:" << _currentImage->size();
-        // qDebug() << "Draw rect:" << _dstRect;
-        QPainter(this).drawImage(_dstRect, *_currentImage);
-    }
+    QImage Image(RbgaFrameBuffer, 1920,
+                 1080, 1080 * 4,
+                 QImage::Format_RGBA8888); 
+
+    std::cout<<"paintEvent"<<std::endl;
+    // qDebug() << "Image size:" << _currentImage->size();
+    // qDebug() << "Draw rect:" << _dstRect;
+    QPainter(this).drawImage(_dstRect, Image);
+
 }
 
 void FramePlayer::freeCurrentImage()

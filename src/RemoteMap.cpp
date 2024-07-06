@@ -20,6 +20,7 @@ extern "C" {
 }
 #include <iostream>
 #include <memory>
+#include <cstdint>
 
 VideoWidget::VideoWidget(QWidget *parent): QVideoWidget(parent)
 {
@@ -45,7 +46,7 @@ RemoteMap::RemoteMap(QWidget *parent)
 {
     ui->setupUi(this);
 
-    RemCPoint = new RemoteCommunicate(WorkMode::WORK_MODE_CLIENT);
+    RemCPoint = new RemoteCommunicate();
     if (RemCPoint == nullptr)
     {
         std::cout << "make shared remotecommunicate error" << std::endl;
@@ -55,16 +56,19 @@ RemoteMap::RemoteMap(QWidget *parent)
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    FramePlayer* framePlayerInstance = new FramePlayer(this);
+    FramePlayer *framePlayerInstance = new FramePlayer(this);
     framePlayerInstance->setObjectName("video_play");
     layout->addWidget(framePlayerInstance); // 添加到布局中，子控件会自动扩展填满空间
     this->setLayout(layout);
     framePlayerInstance->play(500);
 
-    // auto callback = [&framePlayerInstance]
-    // RemCPoint->SetPlayCallBack();
+    RemCPoint->RegisterCallBackByLambda(CommunicateMessageType::MESSAGE_TYPE_VIDEO,
+                                        [framePlayerInstance](uint8_t* data, int datasize){
+                                            framePlayerInstance->SetFrame(data,datasize);
+                                        }
+    );
 
-    // setCentralWidget(frmaePlayerInstance);
+    RemCPoint->Start();
 
     // VideoWidget *videoWidget = new VideoWidget(this);
     // videoWidget->resize(400, 300);

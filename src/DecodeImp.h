@@ -27,12 +27,13 @@ public:
     void DecodeHandlerFrame(uint8_t *data, int data_size, PlayCallBack cb);
 
     void CloseRecored();
+
 private:
     int DoDecode(PlayCallBack cb);
 
 private:
     AVCodecContext *Decodec_ctx = NULL;
-    AVCodec *codec = NULL;
+    const AVCodec *codec = NULL;
     AVCodecParserContext *parser = NULL;
     struct SwsContext *sws_ctx = NULL;
 

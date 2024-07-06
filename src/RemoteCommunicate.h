@@ -12,18 +12,14 @@
 #include <condition_variable>
 #include <thread>
 #include <winsock2.h>
+#include <map>
+#include <iostream>
 
 using std::string;
 
 using ConnectCallBack = std::function<int(bool)>;
 
-using PlayCallBack = std::function<void(uint8_t*,int)>;
-
-enum class WorkMode
-{
-    WORK_MODE_CLIENT = 0,
-    WORK_MODE_SERVER = 1,
-};
+using MessageRecvCallBack = std::function<void(uint8_t*,int)>;
 
 enum class RCState
 {
@@ -33,20 +29,43 @@ enum class RCState
     RC_STATE_CLOSED,
 };
 
+enum class CommunicateMessageType
+{
+    MESSAGE_TYPE_VIDEO = 0,
+};
+
 class RemoteCommunicate
 {
 public:
-    RemoteCommunicate(WorkMode mode);
+    RemoteCommunicate();
 
     virtual ~RemoteCommunicate();
 
-    bool DisConnect();
+    bool Start();
+
+    bool Stop();
 
     bool SendMessage(std::shared_ptr<RemoteMessage> message);
 
     SOCKET GetSocket();
 
-    void SetPlayCallBack(PlayCallBack cb);
+    void RegisterCallBack(CommunicateMessageType eventType, MessageRecvCallBack callback) 
+    {
+        CallBackList[eventType] = callback;
+    }
+
+    // 使用 Lambda 表达式订阅 SourceClass 的成员函数到 NetworkEvent 类型事件
+    // eventManager.RegisterCallBackByLambda(EventType::NetworkEvent,
+    //     [&src](const NetworkData& data) {
+    //         src.functionToRegister(data); // 使用捕获的引用调用成员函数
+    //     }
+    // );
+    void RegisterCallBackByLambda(CommunicateMessageType eventType, MessageRecvCallBack callback) 
+    {
+        std::cout<<"register callback"<<std::endl;
+
+        CallBackList[eventType] = callback;
+    } 
 
 private:
     bool CommunicateThreadStart();
@@ -73,10 +92,8 @@ private:
 
     SOCKET client_socket;
 
-    WorkMode workmode;
-
     DecodeImp* DecodeImpInstance;
 
-    PlayCallBack PlayCallBackFunction;
+    std::map<CommunicateMessageType, MessageRecvCallBack> CallBackList;
 };
 #endif // REMOTECOMMUNICATE_H

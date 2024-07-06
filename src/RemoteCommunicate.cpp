@@ -19,26 +19,15 @@ static int ConnectCallBackHandler(bool status)
     return 0;
 }
 
-RemoteCommunicate::RemoteCommunicate(WorkMode mode) : workmode(mode), State(RCState::RC_STATE_INIT)
+RemoteCommunicate::RemoteCommunicate():State(RCState::RC_STATE_INIT)
 {
     std::cout<<"RemoteCommunicate Create"<<std::endl;
-    
-    this->CommunicateThreadStart();
-
-    this->NetThreadStart();
-
-    DecodeImpInstance = new DecodeImp();
-
-    if(DecodeImpInstance->Init() < 0)
-    {
-        std::cout<<"DecodeImp init error"<<std::endl;
-    }
 }
 
 RemoteCommunicate::~RemoteCommunicate()
 {
     std::cout << "RemoteCommunicate delete" << std::endl;
-    DisConnect();
+    Stop();
     // TODO how stop thread
 }
 
@@ -84,9 +73,26 @@ bool RemoteCommunicate::Connect(string Id, ConnectCallBack cb)
     return true;
 }
 
-bool RemoteCommunicate::DisConnect()
+bool RemoteCommunicate::Start()
 {
-    std::cout << "DisConnect" << std::endl;
+    std::cout<<"RemoteCommunicate Start"<<std::endl;
+    
+    DecodeImpInstance = new DecodeImp();
+
+    if(DecodeImpInstance->Init() < 0)
+    {
+        std::cout<<"DecodeImp init error"<<std::endl;
+        return false;
+    }
+
+    this->CommunicateThreadStart();
+
+    return this->NetThreadStart();
+}
+
+bool RemoteCommunicate::Stop()
+{
+    std::cout << "Stop" << std::endl;
     // 关闭Socket连接
     closesocket(client_socket);
     // 清理Winsock库
@@ -153,16 +159,6 @@ bool RemoteCommunicate::NetThreadStart()
 
 void RemoteCommunicate::ProcessMessage()
 {
-    // const char *message = "Hello, server!";
-    // if (send(client_socket, message, strlen(message), 0) == SOCKET_ERROR)
-    // {
-    //     std::cout<<"send socket return error"<<std::endl;
-    //     closesocket(client_socket);
-    //     client_socket = -1;
-    //     this->State = RCState::RC_STATE_CLOSED;
-    //     return;
-    // }
-
     // 接收服务器的响应
     char buffer[4096];
     int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
@@ -179,7 +175,15 @@ void RemoteCommunicate::ProcessMessage()
     else
     {
         // std::cout << "recv server message :" << bytes_received << std::endl;
-        DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t*>(buffer), bytes_received, PlayCallBackFunction);
+        PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
+        if(callbackfunction == nullptr)
+        {
+            std::cout<<"not find callbackfunction"<<std::endl;
+        }
+        // std::cout<<"callbackfunction"<<callbackfunction<<std::endl;
+        DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t *>(buffer),
+                                              bytes_received,
+                                              callbackfunction);
     }
 }
 
@@ -228,9 +232,4 @@ void RemoteCommunicate::NetMachineState()
     default:
         break;
     }
-}
-
-void RemoteCommunicate::SetPlayCallBack(PlayCallBack cb)
-{
-    PlayCallBackFunction = cb;
 }
