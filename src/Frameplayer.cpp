@@ -25,7 +25,6 @@ FramePlayer::FramePlayer(QWidget *parent) : QWidget(parent)
 
 FramePlayer::~FramePlayer()
 {
-    freeCurrentImage();
     stopTimer();
 }
 
@@ -47,7 +46,6 @@ void FramePlayer::pause()
 void FramePlayer::stop()
 {
     if (_state == Stopped) return;
-    freeCurrentImage();
     stopTimer();
     update();
     setState(Stopped);
@@ -58,7 +56,7 @@ bool FramePlayer::isPlaying()
     return _state == Playing;
 }
 
-FramePlayer::State FramePlayer::GetState()
+FramePlayer::State FramePlayer::getState()
 {
     return _state;
 }
@@ -75,34 +73,15 @@ void FramePlayer::setState(State state)
     emit stateChanged();
 }
 
-void FramePlayer::SetFrame(uint8_t* data, int size)
+void FramePlayer::setFrame(uint8_t* data, int size)
 {
-    // std::cout<<"setFrame" <<std::endl;
-    //if(RbgaFrameBuffer)
-    {
-        //need copy;
-        //std::cout << "data Address: " << static_cast<void*>(data) << std::endl;
-        //std::cout << "Frame Buffer Address: " << static_cast<void*>(RbgaFrameBuffer) << std::endl;
-        //qDebug() << RbgaFrameBuffer;
-        memcpy(&RbgaFrameBuffer[0], data, size);
-    }
-    // else
-    // {
-    //     std::cout<<"RbgaFrameBuffer is free"<<std::endl;
-    // }
-}
-
-void FramePlayer::SendFrame(ViewFrame *frame)
-{
-
+    memcpy(&RbgaFrameBuffer[0], data, size);
 }
 
 void FramePlayer::timerEvent(QTimerEvent *event)
 {
-    std::cout<<"update1...."<<std::endl;
     if (event->timerId() == this->_timerId)
     {
-        std::cout<<"update...."<<std::endl;
         update();
     }
 }
@@ -110,23 +89,10 @@ void FramePlayer::timerEvent(QTimerEvent *event)
 void FramePlayer::paintEvent(QPaintEvent *event)
 {
     QImage Image(RbgaFrameBuffer, 1920,
-                 1080, 1080 * 4,
+                 1080, 1920 * 4,
                  QImage::Format_RGBA8888); 
 
-    std::cout<<"paintEvent"<<std::endl;
-    // qDebug() << "Image size:" << _currentImage->size();
-    // qDebug() << "Draw rect:" << _dstRect;
     QPainter(this).drawImage(_dstRect, Image);
-
-}
-
-void FramePlayer::freeCurrentImage()
-{
-    if (_currentImage)
-    {
-        delete _currentImage;
-        _currentImage = nullptr;
-    }
 }
 
 void FramePlayer::stopTimer()

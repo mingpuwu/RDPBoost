@@ -15,24 +15,6 @@ extern "C" {
 #include <list>
 #include <mutex>
 
-class ViewFrame
-{
-public:
-    ViewFrame(int width, int height,
-              int fps, uint8_t* data,
-              AVPixelFormat format):width(width),height(height),fps(fps),data(data),pixelFormat(format)
-    {
-
-    }
-
-public:
-    int width;
-    int height;
-    AVPixelFormat pixelFormat;
-    int fps;
-    uint8_t* data;
-};
-
 class FramePlayer : public QWidget {
     Q_OBJECT
 
@@ -48,8 +30,6 @@ public:
     
     ~FramePlayer();
 
-    void SendFrame(ViewFrame *frame);
-
     void play(int interval);
 
     void pause();
@@ -58,9 +38,9 @@ public:
 
     bool isPlaying();
 
-    void SetFrame(uint8_t* data, int size);
+    void setFrame(uint8_t* data, int size);
 
-    State GetState();
+    State getState();
 
 signals:
     void stateChanged();
@@ -68,14 +48,12 @@ signals:
 private:
     int _timerId = 0;
     State _state = Stopped;
-    QImage *_currentImage = nullptr;
     QRect _dstRect;
     int _interval;
     int _imgSize = 0;
 
     void timerEvent(QTimerEvent *event);
     void paintEvent(QPaintEvent *event);
-    void freeCurrentImage();
     void setState(State state);
     void stopTimer();
     std::mutex MutexLock;

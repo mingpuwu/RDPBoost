@@ -96,8 +96,6 @@ int EnCodeImp::Init()
     if (!pkt)
         return -1;
 
-    // rgba_data = (uint8_t *)av_malloc(codec_context->width * codec_context->height * 4); // RGBA data
-
     // Create a software scaling context
     sws_context = sws_getContext(codec_context->width, codec_context->height, AV_PIX_FMT_RGBA,
                                  codec_context->width, codec_context->height, AV_PIX_FMT_YUV420P,
