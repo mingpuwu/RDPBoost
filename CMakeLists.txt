@@ -22,8 +22,8 @@ set(FFMPEG_INC_DIR_6_1 "3rdparty/ffmpeg_6_1_1/include/")
 set(FFMPEG_DLL_DIR_4_4 "3rdparty/libffmpeg_4_4/lib/x64/")
 set(FFMPEG_INC_DIR_4_4 "3rdparty/libffmpeg_4_4/include/")
 
-set(FFMPEG_DLL_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_DLL_DIR_6_1}")
-set(FFMPEG_INC_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_INC_DIR_6_1}")
+set(FFMPEG_DLL_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_DLL_DIR_4_4}")
+set(FFMPEG_INC_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_INC_DIR_4_4}")
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
