@@ -1,6 +1,7 @@
 #include "ClientCommunicate.h"
 #include "RemoteProtocol.h"
 #include "DecodeImp.h"
+#include "Logger.h"
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -75,6 +76,7 @@ bool RemoteCommunicate::Connect(string Id, ConnectCallBack cb)
 
 bool RemoteCommunicate::Start()
 {
+    LoggerI()->info("RemoteCommunicate Start");
     std::cout<<"RemoteCommunicate Start"<<std::endl;
     
     DecodeImpInstance = new DecodeImp();
@@ -82,6 +84,7 @@ bool RemoteCommunicate::Start()
     if(DecodeImpInstance->Init() < 0)
     {
         std::cout<<"DecodeImp init error"<<std::endl;
+        LoggerI()->error("DecodeImp init error");
         return false;
     }
 
@@ -93,6 +96,7 @@ bool RemoteCommunicate::Start()
 bool RemoteCommunicate::Stop()
 {
     std::cout << "Stop" << std::endl;
+    LoggerI()->warn("Stop");
     // 关闭Socket连接
     closesocket(client_socket);
     // 清理Winsock库

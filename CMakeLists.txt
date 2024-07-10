@@ -22,17 +22,24 @@ set(FFMPEG_INC_DIR_6_1 "3rdparty/ffmpeg_6_1_1/include/")
 set(FFMPEG_DLL_DIR_4_4 "3rdparty/libffmpeg_4_4/lib/x64/")
 set(FFMPEG_INC_DIR_4_4 "3rdparty/libffmpeg_4_4/include/")
 
+set(SPDLOG_INC_DIR "3rdparty/spdlog-1.14.1/include/")
+
 set(FFMPEG_DLL_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_DLL_DIR_4_4}")
 set(FFMPEG_INC_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_INC_DIR_4_4}")
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
 
+add_subdirectory(3rdparty/spdlog-1.14.1)
+
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${FFMPEG_INC_DIR}
+    ${SPDLOG_INC_DIR}
     )
+
+link_directories(${CMAKE_BINARY_DIR}/"3rdparty/spdlog-1.14.1/")
 
 file(GLOB_RECURSE PROJECT_SOURCES src/*.cpp src/*.h src/*.ui)
 
@@ -62,7 +69,8 @@ target_link_libraries(RDPBoost PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
                         ${FFMPEG_DLL_DIR}/avcodec.lib
                         ${FFMPEG_DLL_DIR}/avformat.lib
                         ${FFMPEG_DLL_DIR}/avutil.lib
-                        ${FFMPEG_DLL_DIR}/swscale.lib)
+                        ${FFMPEG_DLL_DIR}/swscale.lib
+                        libspdlogd.a)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

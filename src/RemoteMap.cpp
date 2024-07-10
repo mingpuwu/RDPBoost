@@ -3,6 +3,7 @@
 #include "remotemap.h"
 #include "ui_remotemap.h"
 #include "Frameplayer.h"
+#include "Logger.h"
 
 #include <QVBoxLayout>
 #include <QWidget>
@@ -50,6 +51,7 @@ RemoteMap::RemoteMap(QWidget *parent)
     if (RemCPoint == nullptr)
     {
         std::cout << "make shared remotecommunicate error" << std::endl;
+        LoggerI()->info("make shared remotecommunicate error");
     }
 
     this->resize(800, 600);
