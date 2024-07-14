@@ -1,0 +1,11 @@
+FluVFlyout {
+    /* background-color: rgb(249, 249, 249); */
+    /* background-color: aquamarine; */
+    border-radius: 8px;
+}
+
+#shadowWidget {
+    background-color: rgb(249, 249, 249);
+    border: 1px solid rgba(195, 195, 195, 0.5);
+    border-radius: 8px;
+}
