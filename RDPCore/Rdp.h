@@ -3,9 +3,6 @@
 #include "ClientCommunicate.h"
 #include <QWidget>
 #include <QLabel>
-#include <list>
-#include <vector>
-#include <memory>
 
 class RdpSubWindows:public QWidget
 {
@@ -26,7 +23,7 @@ private:
 
 private:
     QLabel *imageLabel;
-    RemoteCommunicate* RemCPoint;
+    ClientCommunicate* RemCPoint;
 };
 
 #endif // RDP_H

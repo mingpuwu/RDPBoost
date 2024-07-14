@@ -4,6 +4,7 @@
 #include <FramelessHelper/Widgets/framelesswidgetshelper.h>
 #include <FramelessHelper/Widgets/standardsystembutton.h>
 #include <FramelessHelper/Widgets/standardtitlebar.h>
+#include "../RDPCore/Logger.h"
 #include <QApplication>
 
 FRAMELESSHELPER_USE_NAMESPACE
@@ -11,10 +12,6 @@ FRAMELESSHELPER_USE_NAMESPACE
 FluGalleryWindow::FluGalleryWindow(QWidget *parent /*= nullptr*/) : FluFrameLessWidget(parent)
 {
     setWindowTitle("RDPBoost");
-
-#ifndef _DEBUG
-    setWindowTitle("CppQt WinUI3 Gallery");
-#endif
 
     setWindowIcon(QIcon("../res/Tiles/GalleryIcon.ico"));
 
@@ -40,12 +37,6 @@ FluGalleryWindow::FluGalleryWindow(QWidget *parent /*= nullptr*/) : FluFrameLess
     //  m_contentLayout->addSpacing(20);
     m_contentLayout->addLayout(m_sLayout, 1);
 
-    //  auto homePage = new FluHomePage(this);
-    //  m_sLayout->addWidget(homePage);
-
-    //  auto aEmptyPage = new FluAEmptyPage(this);
-    //  m_sLayout->addWidget(aEmptyPage);
-
     // home
     makeHomeNavItem();
 
@@ -54,6 +45,7 @@ FluGalleryWindow::FluGalleryWindow(QWidget *parent /*= nullptr*/) : FluFrameLess
 
 void FluGalleryWindow::closeEvent(QCloseEvent *event)
 {
+    LoggerI()->info("FluGalleryWindow close");
     // FluMessageBox messageBox("Close Gallery Window?", "choose \"Ok\" to close. choose \"Cancel\" do nothing.", this);
     // messageBox.exec();
 
@@ -68,6 +60,7 @@ void FluGalleryWindow::closeEvent(QCloseEvent *event)
     //  {
     //     event->accept();
     // }
+    ServerInstance->StopScreenCapture();
 }
 
 void FluGalleryWindow::onThemeChanged()

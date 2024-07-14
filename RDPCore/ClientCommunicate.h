@@ -34,12 +34,12 @@ enum class CommunicateMessageType
     MESSAGE_TYPE_VIDEO = 0,
 };
 
-class RemoteCommunicate
+class ClientCommunicate
 {
 public:
-    RemoteCommunicate();
+    ClientCommunicate();
 
-    virtual ~RemoteCommunicate();
+    virtual ~ClientCommunicate();
 
     bool Start();
 

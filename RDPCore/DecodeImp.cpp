@@ -1,4 +1,5 @@
 #include "DecodeImp.h"
+#include "Logger.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -44,21 +45,21 @@ int DecodeImp::Init()
                              0, nullptr, nullptr, nullptr);
     if(!sws_ctx)
     {
-        std::cout<<"sws_getContext"<<std::endl;
+        LoggerI()->error("sws_getContext");
         return -1;
     }
 
     codec = avcodec_find_decoder(AV_CODEC_ID_H264);
     if (!codec)
     {
-        fprintf(stderr, "Failed to find codec\n");
+        LoggerI()->error("Failed to find codec");
         return -1;
     }
 
     parser = av_parser_init(codec->id);
     if(!parser)
     {
-        std::cout<<"parser init error"<<std::endl;
+        LoggerI()->error("parser init error");
         return -1;
     }
 
@@ -66,28 +67,28 @@ int DecodeImp::Init()
 
     if (avcodec_open2(Decodec_ctx, codec, NULL) < 0)
     {
-        fprintf(stderr, "Failed to open codec\n");
+        LoggerI()->error("Failed to open codec");
         return -1;
     }
 
     pkt = av_packet_alloc();
     if(!pkt)
     {
-        std::cout<<"alloc pkt error"<<std::endl;
+        LoggerI()->error("alloc pkt error");
         return -1;
     }
 
     frame = av_frame_alloc();
     if(!frame)
     {
-        std::cout<<"alloc frame error"<<std::endl;
+        LoggerI()->error("alloc frame error");
         return -1;
     }
 
     rgbframe = av_frame_alloc();
     if(!rgbframe)
     {
-        std::cout<<"alloc rgbframe error"<<std::endl;
+        LoggerI()->error("alloc rgbframe error");
         return -1;
     }
 
@@ -98,14 +99,14 @@ int DecodeImp::Init()
     int ret = av_frame_get_buffer(rgbframe, 32);
     if(ret < 0)
     {
-        std::cout<<"av_frame_get_buffer error"<<std::endl;
+        LoggerI()->error("av_frame_get_buffer error");
         return -1;
     }
 
     RecordFile = std::fopen(RecordFileName.c_str(),"wb+");
     if(!RecordFile)
     {
-        std::cout<<"open output file error"<<std::endl;
+        LoggerI()->error("open output file error");
         return -1;
     }
 
@@ -138,7 +139,7 @@ int DecodeImp::DoDecode(PlayCallBack cb)
     int ret = avcodec_send_packet(Decodec_ctx, pkt);
     if(ret < 0)
     {
-        std::cout<<"send packet error"<<std::endl;
+        LoggerI()->error("send packet error");
         return -1;
     }
 
@@ -152,7 +153,7 @@ int DecodeImp::DoDecode(PlayCallBack cb)
         }
         else if (ret < 0)
         {
-            std::cout<<"decode error"<<std::endl;
+            LoggerI()->error("decode error");
             return -1;
         }
         else
@@ -162,7 +163,7 @@ int DecodeImp::DoDecode(PlayCallBack cb)
 
             if(ret < 0)
             {
-                std::cout<<"sws_scale error"<<std::endl;
+                LoggerI()->error("sws_scale error");
             }
             else
             {
@@ -188,7 +189,10 @@ int DecodeImp::DoDecode(PlayCallBack cb)
 
 void DecodeImp::CloseRecored()
 {
-    std::fflush(RecordFile);
-    std::fclose(RecordFile);
+    if(RecordFile)
+    {
+        std::fflush(RecordFile);
+        std::fclose(RecordFile);
+    }
     RecordFile = nullptr;
 }

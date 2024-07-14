@@ -21,7 +21,7 @@ class MapPage: public FluFrameLessWidget
         void StartCommounicateThread();
 
     private:
-        RemoteCommunicate* RemCPoint;
+        ClientCommunicate* RemCPoint;
 };
 
 #endif  // MAPPAGE_H

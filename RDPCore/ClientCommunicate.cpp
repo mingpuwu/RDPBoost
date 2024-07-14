@@ -20,20 +20,20 @@ static int ConnectCallBackHandler(bool status)
     return 0;
 }
 
-RemoteCommunicate::RemoteCommunicate():State(RCState::RC_STATE_INIT)
+ClientCommunicate::ClientCommunicate():State(RCState::RC_STATE_INIT)
 {
-    std::cout<<"RemoteCommunicate Create"<<std::endl;
+    LoggerI()->info("ClientCommunicate Create");
 }
 
-RemoteCommunicate::~RemoteCommunicate()
+ClientCommunicate::~ClientCommunicate()
 {
-    std::cout << "RemoteCommunicate delete" << std::endl;
+    LoggerI()->info("ClientCommunicate delete");
     Stop();
     // TODO how stop thread
 }
 
 // blocking api
-bool RemoteCommunicate::Connect(string Id, ConnectCallBack cb)
+bool ClientCommunicate::Connect(string Id, ConnectCallBack cb)
 {
     // JUST connect relay
     sockaddr_in server_address;
@@ -43,7 +43,7 @@ bool RemoteCommunicate::Connect(string Id, ConnectCallBack cb)
     // 创建Socket
     if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
     {
-        std::cout << "Socket creation failed" << std::endl;
+        LoggerI()->error("Socket creation failed");
         WSACleanup();
         return false;
     }
@@ -58,14 +58,14 @@ bool RemoteCommunicate::Connect(string Id, ConnectCallBack cb)
     {
         if (connect(client_socket, reinterpret_cast<sockaddr *>(&server_address), sizeof(server_address)) == SOCKET_ERROR)
         {
-            std::cout << "Connection to server failed :" << server_ip << " port:" << server_port << std::endl;
+            LoggerI()->error("Connection to server failed, server ip:{},prot:{}", server_ip, server_port);
             closesocket(client_socket);
             std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }
         else
         {
-            std::cout << "Connection success" << std::endl;
+            LoggerI()->info("Connection success");
             cb(true);
             break;
         }
@@ -74,16 +74,14 @@ bool RemoteCommunicate::Connect(string Id, ConnectCallBack cb)
     return true;
 }
 
-bool RemoteCommunicate::Start()
+bool ClientCommunicate::Start()
 {
-    LoggerI()->info("RemoteCommunicate Start");
-    std::cout<<"RemoteCommunicate Start"<<std::endl;
+    std::cout<<"ClientCommunicate Start"<<std::endl;
     
     DecodeImpInstance = new DecodeImp();
 
     if(DecodeImpInstance->Init() < 0)
     {
-        std::cout<<"DecodeImp init error"<<std::endl;
         LoggerI()->error("DecodeImp init error");
         return false;
     }
@@ -93,10 +91,9 @@ bool RemoteCommunicate::Start()
     return this->NetThreadStart();
 }
 
-bool RemoteCommunicate::Stop()
+bool ClientCommunicate::Stop()
 {
-    std::cout << "Stop" << std::endl;
-    LoggerI()->warn("Stop");
+    LoggerI()->info("Stop");
     // 关闭Socket连接
     closesocket(client_socket);
     // 清理Winsock库
@@ -105,12 +102,12 @@ bool RemoteCommunicate::Stop()
     return true;
 }
 
-SOCKET RemoteCommunicate::GetSocket()
+SOCKET ClientCommunicate::GetSocket()
 {
     return client_socket;
 }
 
-bool RemoteCommunicate::SendMessage(std::shared_ptr<RemoteMessage> message)
+bool ClientCommunicate::SendMessage(std::shared_ptr<RemoteMessage> message)
 {
     // std::cout << "push message to list back" << std::endl;
     std::unique_lock<std::mutex> lc(this->MessageListMutex);
@@ -120,9 +117,9 @@ bool RemoteCommunicate::SendMessage(std::shared_ptr<RemoteMessage> message)
     return true;
 }
 
-bool RemoteCommunicate::CommunicateThreadStart()
+bool ClientCommunicate::CommunicateThreadStart()
 {
-    std::cout << "CommunicateThreadStart" << std::endl;
+    LoggerI()->info("CommunicateThreadStart");
 
     EventWorker = std::thread([this]
                               {
@@ -144,9 +141,9 @@ bool RemoteCommunicate::CommunicateThreadStart()
     return true;
 }
 
-bool RemoteCommunicate::NetThreadStart()
+bool ClientCommunicate::NetThreadStart()
 {
-    std::cout << "NetThreadStart" << std::endl;
+    LoggerI()->info("NetThreadStart");
 
     NetWorker = std::thread([this]
     {
@@ -161,17 +158,17 @@ bool RemoteCommunicate::NetThreadStart()
     return true;
 }
 
-void RemoteCommunicate::ProcessMessage()
+void ClientCommunicate::ProcessMessage()
 {
     // 接收服务器的响应
     char buffer[4096];
     int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
-        std::cout <<"Receiving failed, close socket" << std::endl;
+        LoggerI()->error("Receiving failed, close socket");
         closesocket(client_socket);
         client_socket = -1;
-        std::cout<<"go to RC_STATE_CLOSED"<<std::endl;
+        LoggerI()->error("go to RC_STATE_CLOSED");
         this->State = RCState::RC_STATE_CLOSED;
         DecodeImpInstance->CloseRecored();
         return;
@@ -182,7 +179,7 @@ void RemoteCommunicate::ProcessMessage()
         PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
         if(callbackfunction == nullptr)
         {
-            std::cout<<"not find callbackfunction"<<std::endl;
+            LoggerI()->error("not find callbackfunction");
         }
         // std::cout<<"callbackfunction"<<callbackfunction<<std::endl;
         DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t *>(buffer),
@@ -191,7 +188,7 @@ void RemoteCommunicate::ProcessMessage()
     }
 }
 
-void RemoteCommunicate::NetMachineState()
+void ClientCommunicate::NetMachineState()
 {
     WSADATA wsa_data;
 
@@ -207,7 +204,7 @@ void RemoteCommunicate::NetMachineState()
         }
         else
         {
-            std::cout<<"go to RC_STATE_CONNECTING state"<<std::endl;
+            LoggerI()->info("go to RC_STATE_CONNECTING state");
             this->State = RCState::RC_STATE_CONNECTING;
         }
         break;
@@ -215,7 +212,7 @@ void RemoteCommunicate::NetMachineState()
     case RCState::RC_STATE_CONNECTING:
         if (Connect("testid", ConnectCallBackHandler))
         {
-            std::cout<<"go to RC_STATE_READY state"<<std::endl;
+            LoggerI()->info("go to RC_STATE_READY state");
             // DecodeImpInstance->Init();
             this->State = RCState::RC_STATE_READY;
         }

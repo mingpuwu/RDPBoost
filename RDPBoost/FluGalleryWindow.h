@@ -6,6 +6,7 @@
 #include "FluHomePage.h"
 #include <QStackedLayout>
 #include "../FluControls/FluStackedLayout.h"
+#include "../RDPCore/Server.h"
 
 #include <QPainter>
 #include <QStyleOption>
@@ -23,12 +24,15 @@ class FluGalleryWindow : public FluFrameLessWidget
 
         auto homePage = new FluHomePage;
         m_sLayout->addWidget("HomePage", homePage);
-        connect(item, &FluVNavigationIconTextItem::itemClicked, [=]() 
-        {
+        connect(item, &FluVNavigationIconTextItem::itemClicked, [=]() {
             m_sLayout->setCurrentWidget("HomePage");
             //  FluMessageBox messageBox("Close Gallery Window?", "choose \"Ok\" to close. choose \"Cancel\" do nothing.", this);
             // int nExec = messageBox.exec();
         });
+
+        ServerInstance = new Server;
+        ServerInstance->Init();
+        ServerInstance->StartScreenCapture();
     }
 
     void resizeEvent(QResizeEvent *event)
@@ -65,4 +69,7 @@ class FluGalleryWindow : public FluFrameLessWidget
   protected:
     FluVNavigationView *m_navView;
     FluStackedLayout *m_sLayout;
+
+  private:
+    Server *ServerInstance;
 };

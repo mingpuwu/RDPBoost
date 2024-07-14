@@ -2,6 +2,7 @@
 #include "../RDPCore/Logger.h"
 #include "../RDPCore/ClientCommunicate.h"
 #include "../RDPCore/Frameplayer.h"
+#include "../RDPCore/Logger.h"
 #include <QMouseEvent>
 
 MapPage::MapPage(QWidget *parent)
@@ -10,10 +11,9 @@ MapPage::MapPage(QWidget *parent)
 
     resize(1200, 800);
 
-    RemCPoint = new RemoteCommunicate();
+    RemCPoint = new ClientCommunicate();
     if (RemCPoint == nullptr)
     {
-        std::cout << "make shared remotecommunicate error" << std::endl;
         LoggerI()->info("make shared remotecommunicate error");
     }
 
@@ -70,7 +70,7 @@ void MapPage::mousePressEvent(QMouseEvent *event)
 void MapPage::closeEvent(QCloseEvent *event)
 {
     // 在窗口关闭事件发生时执行的代码
-    qDebug() << "Window is closing...";
+    LoggerI()->info("MapPage Window is closing");
 
     //RemCPoint->DisConnect();
     delete RemCPoint;

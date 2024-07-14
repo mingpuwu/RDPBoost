@@ -6,9 +6,9 @@
 class Server
 {
 public:
-    Server();
+    Server(){};
 
-    bool Init();
+    bool Init() {return true;};
 
     void StartScreenCapture();
 

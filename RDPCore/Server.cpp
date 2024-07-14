@@ -1,6 +1,7 @@
 #include "Server.h"
 #include "CdxgiCaptureImpl.h"
 #include "EnCodeImp.h"
+#include "Logger.h"
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -10,21 +11,21 @@ static int ScreenCaptureRunFlag = 0;
 
 static void ScreenCaptureThreadHandler(void* arg)
 {
-    std::cout<<"ScreenCaptureThreadHandler start"<<std::endl;
+    LoggerI()->info("ScreenCaptureThreadHandler start");
 
     CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(false);
     EnCodeImp* EncodeImpI = new EnCodeImp();
 
     if(EncodeImpI->Init() < 0)
     {
-        std::cout<<"encode init error"<<std::endl;
+        LoggerI()->error("encode init error");
         return;
     }
     TDxgiAdapterOutput out = impl->get(L"");
     BOOL bRet = impl->InitDxgiCapture(out);
     if (!bRet)
     {
-        std::cout << " InitDxgiCapture Error"<<std::endl;
+        LoggerI()->error("InitDxgiCapture Error");
         return;
     }
 
@@ -48,11 +49,11 @@ static void ScreenCaptureThreadHandler(void* arg)
         {
             if (pVideoTexture)//纹理捕获成功
             {
-                std::cout << "capture video succuess"<<std::endl;
+                LoggerI()->info("capture video succuess");
             }
             else if (nWidthPicth > 0)//视频数据捕获成功  pVideoData就是视频RGBA数据
             {
-                std::cout << "read raw RGBA data"<<std::endl;
+                LoggerI()->debug("read raw RGBA data");
                 int width = 1920; // 图像宽度
                 int height = 1080; // 图像高度
                 int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
@@ -71,18 +72,18 @@ static void ScreenCaptureThreadHandler(void* arg)
             }
             else
             {
-                std::cout << "capture timeout"<<std::endl;
+                LoggerI()->warn("capture timeout");
             }
         }
         else
         {
-            std::cout << "capture error,continue"<<std::endl;
+            LoggerI()->warn("capture error,continue");
             // break;
         }
         Sleep(50);
     }
 
-    std::cout<<"ScreenCapture thread stop"<<std::endl;
+    LoggerI()->info("ScreenCapture thread stop");
 
     #ifdef DEBUG
     outfile.flush();
@@ -90,22 +91,13 @@ static void ScreenCaptureThreadHandler(void* arg)
     #endif
 
     impl->UnInitDxgiCapture();
+    
     return;
-}
-
-Server::Server() 
-{
-
-}
-
-bool Server::Init()
-{
-    return true;
 }
 
 void Server::StartScreenCapture()
 {
-    std::cout<<"start capture screen"<<std::endl;
+    LoggerI()->info("start capture screen");
     ScreenCaptureRunFlag = 1;
 
     std::thread ScreenCaptureThread(ScreenCaptureThreadHandler, nullptr);
@@ -114,7 +106,7 @@ void Server::StartScreenCapture()
 
 void Server::StopScreenCapture()
 {
-    std::cout<<"stop screen"<<std::endl;
+    LoggerI()->info("stop screen");
     ScreenCaptureRunFlag = 0;
 }
 

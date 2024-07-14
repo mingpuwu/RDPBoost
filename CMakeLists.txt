@@ -19,6 +19,10 @@ set(SPDLOG_INC_DIR "3rdparty/spdlog-1.14.1/include/")
 set(FFMPEG_DLL_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_DLL_DIR_4_4}")
 set(FFMPEG_INC_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_INC_DIR_4_4}")
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Configuring for Debug build")
+    add_definitions(-DDEBUG)
+endif()
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets Svg Multimedia MultimediaWidgets)
 qt_standard_project_setup()
