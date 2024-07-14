@@ -1,4 +1,4 @@
-#include "rdp.h"
+#include "Rdp.h"
 #include "ClientCommunicate.h"
 #include <QVBoxLayout>
 #include <QWidget>
