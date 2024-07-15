@@ -1,6 +1,6 @@
 #ifndef RDP_H
 #define RDP_H
-#include "ClientCommunicate.h"
+#include "Communicate.h"
 #include <QWidget>
 #include <QLabel>
 
@@ -23,7 +23,7 @@ private:
 
 private:
     QLabel *imageLabel;
-    ClientCommunicate* RemCPoint;
+    Communicate* RemCPoint;
 };
 
 #endif // RDP_H

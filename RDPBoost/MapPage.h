@@ -2,7 +2,7 @@
 #define MAPPAGE_H
 #include "../FluControls/FluFrameLessWidget.h"
 #include "../FluControls/FluStackedLayout.h"
-#include "../RDPCore/ClientCommunicate.h"
+#include "../RDPCore/Communicate.h"
 
 class MapPage: public FluFrameLessWidget
 {
@@ -21,7 +21,7 @@ class MapPage: public FluFrameLessWidget
         void StartCommounicateThread();
 
     private:
-        ClientCommunicate* RemCPoint;
+        Communicate* RemCPoint;
 };
 
 #endif  // MAPPAGE_H

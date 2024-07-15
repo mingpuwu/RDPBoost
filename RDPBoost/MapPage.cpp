@@ -1,6 +1,6 @@
 #include "MapPage.h"
 #include "../RDPCore/Logger.h"
-#include "../RDPCore/ClientCommunicate.h"
+#include "../RDPCore/Communicate.h"
 #include "../RDPCore/Frameplayer.h"
 #include "../RDPCore/Logger.h"
 #include <QMouseEvent>
@@ -11,7 +11,7 @@ MapPage::MapPage(QWidget *parent)
 
     resize(1200, 800);
 
-    RemCPoint = new ClientCommunicate();
+    RemCPoint = new Communicate();
     if (RemCPoint == nullptr)
     {
         LoggerI()->info("make shared remotecommunicate error");

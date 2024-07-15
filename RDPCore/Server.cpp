@@ -1,4 +1,5 @@
 #include "Server.h"
+#include "Communicate.h"
 #include "CdxgiCaptureImpl.h"
 #include "EnCodeImp.h"
 #include "Logger.h"
@@ -113,4 +114,39 @@ void Server::StopScreenCapture()
 bool Server::SendVideoStream()
 {
     return true;
+}
+
+bool Server::Init()
+{
+    RemServerPoint = new Communicate(CommunicateType::COMMUNICATE_TYPE_SERVER);
+    if (RemServerPoint == nullptr)
+    {
+        LoggerI()->info("make shared RemServerPoint error");
+    }
+
+    RemServerPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_MOUSE, 
+                                    [this](int x, int y){
+                                        MoveMouse(x, y);
+                                    })
+
+    // RemServerPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_MOUSE_PRESS, 
+    //                                 [this](int x, int y,){
+    //                                     MoveMouse(x, y);
+    //                                 })  
+
+    RemServerPoint->Start(); 
+}
+
+void Server::MoveMouse(int x, int y)
+{
+    //need map to widget
+    LoggerI()->info("move mouse to {} {}", x, y);
+    SetCursorPos(x, y);
+}
+
+void Server::clickMouse(int x, int y, DWORD buttonFlags)
+{
+    //need map to widget
+    LoggerI()->info("click mouse {}", buttonFlags);
+    mouse_event(buttonFlags, x, y, 0, 0);
 }

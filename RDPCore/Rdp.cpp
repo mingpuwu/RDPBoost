@@ -1,5 +1,5 @@
 #include "Rdp.h"
-#include "ClientCommunicate.h"
+#include "Communicate.h"
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QLabel>
@@ -14,7 +14,7 @@ RdpSubWindows::RdpSubWindows(QWidget *parent)
     // QVBoxLayout *layout = new QVBoxLayout(this);
     // layout->addWidget(imageLabel);
     // setLayout(layout);
-    // RemCPoint = new ClientCommunicate(WorkMode::WORK_MODE_CLIENT);
+    // RemCPoint = new Communicate(WorkMode::WORK_MODE_CLIENT);
     // if (RemCPoint == nullptr)
     // {
     //     std::cout << "make shared remotecommunicate error" << std::endl;

@@ -32,14 +32,23 @@ enum class RCState
 enum class CommunicateMessageType
 {
     MESSAGE_TYPE_VIDEO = 0,
+    MESSAGE_TYPE_MOUSE,
+    MESSAGE_TYPE_MOUSE_PRESS,
+    MESSAGE_TYPE_KEYBOARD,
 };
 
-class ClientCommunicate
+enum class CommunicateType
+{
+    COMMUNICATE_TYPE_CLIENT = 0,
+    COMMUNICATE_TYPE_SERVER,
+}
+
+class Communicate
 {
 public:
-    ClientCommunicate();
+    Communicate(CommunicateType type);
 
-    virtual ~ClientCommunicate();
+    virtual ~Communicate();
 
     bool Start();
 
@@ -59,7 +68,9 @@ private:
 
     bool NetThreadStart();
 
-    void ProcessMessage();
+    void ProcessMessageAsClient();
+
+    void ProcessMessageAsServer();
 
     bool Connect(string Id, ConnectCallBack cb);
 
@@ -69,7 +80,6 @@ private:
     std::list<std::shared_ptr<RemoteMessage>> SendMessageList;
 
     std::mutex MessageListMutex;
-
     std::condition_variable cv;
 
     RCState State;
@@ -82,5 +92,7 @@ private:
     DecodeImp *DecodeImpInstance;
 
     std::map<CommunicateMessageType, MessageRecvCallBack> CallBackList;
+
+    CommunicateType type
 };
 #endif // CLIENTCOMMUNICATE_H
