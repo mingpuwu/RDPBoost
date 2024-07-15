@@ -16,11 +16,11 @@ extern "C" {
 
 uint8_t RbgaFrameBuffer[1920*1080*4];
 
-
 FramePlayer::FramePlayer(QWidget *parent) : QWidget(parent)
 {
     // 初始化代码...
-    _dstRect = QRect(0, 0, 640, 480);
+    QRect ParentRect = parent->rect();
+    _dstRect = QRect(0, 0, ParentRect.width(), ParentRect.height());
 }
 
 FramePlayer::~FramePlayer()
