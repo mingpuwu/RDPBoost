@@ -19,7 +19,7 @@ using std::string;
 
 using ConnectCallBack = std::function<int(bool)>;
 
-using MessageRecvCallBack = std::function<void(uint8_t *, int)>;
+using MessageRecvCallBack = std::function<void(uint8_t *, int, int)>;
 
 enum class RCState
 {
@@ -41,7 +41,7 @@ enum class CommunicateType
 {
     COMMUNICATE_TYPE_CLIENT = 0,
     COMMUNICATE_TYPE_SERVER,
-}
+};
 
 class Communicate
 {
@@ -93,6 +93,6 @@ private:
 
     std::map<CommunicateMessageType, MessageRecvCallBack> CallBackList;
 
-    CommunicateType type
+    CommunicateType type;
 };
 #endif // CLIENTCOMMUNICATE_H

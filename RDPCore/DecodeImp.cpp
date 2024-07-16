@@ -177,7 +177,7 @@ int DecodeImp::DoDecode(PlayCallBack cb)
                 if(cb)
                 {
                     // std::cout<<"call cb"<<std::endl;
-                    cb(rgbframe->data[0], rgbframe->linesize[0]*1080);
+                    cb(rgbframe->data[0], rgbframe->linesize[0]*1080, 0);
                 }
             }
 

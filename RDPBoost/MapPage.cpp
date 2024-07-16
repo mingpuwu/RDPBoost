@@ -11,7 +11,7 @@ MapPage::MapPage(QWidget *parent)
 
     resize(1200, 800);
 
-    RemCPoint = new Communicate();
+    RemCPoint = new Communicate(CommunicateType::COMMUNICATE_TYPE_CLIENT);
     if (RemCPoint == nullptr)
     {
         LoggerI()->info("make shared remotecommunicate error");
@@ -23,7 +23,7 @@ MapPage::MapPage(QWidget *parent)
     framePlayerInstance->play(500);
 
     RemCPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_VIDEO,
-                                        [framePlayerInstance](uint8_t* data, int datasize){
+                                        [framePlayerInstance](uint8_t* data, int datasize, int len){
                                             framePlayerInstance->setFrame(data,datasize);
                                         }
     );

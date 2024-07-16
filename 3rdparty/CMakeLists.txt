@@ -18,6 +18,8 @@ set(QWINDOWKIT_BUILD_QUICK OFF)
 set(QWINDOWKIT_INSTALL OFF)
 add_subdirectory("qwindowkit-1.1.0")
 
+add_subdirectory("protobuf")
+
 set(TGT qwindowkit)
 add_library(qwindowkit INTERFACE)
 target_link_libraries(${TGT}

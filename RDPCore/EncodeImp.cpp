@@ -37,7 +37,6 @@ int EnCodeImp::Init()
 
     // av_register_all();
 
-
     // Find the H.264 encoder
     Encodec = avcodec_find_encoder(AV_CODEC_ID_H264);
     if (!Encodec)

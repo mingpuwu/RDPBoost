@@ -2,6 +2,7 @@
 #include "RemoteProtocol.h"
 #include "DecodeImp.h"
 #include "Logger.h"
+#include "Server.h"
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -22,12 +23,12 @@ static int ConnectCallBackHandler(bool status)
 
 Communicate::Communicate(CommunicateType t):State(RCState::RC_STATE_INIT),type(t)
 {
-    LoggerI()->info("{} Communicate Create",type);
+    LoggerI()->info("{} Communicate Create",static_cast<uint8_t>(type));
 }
 
 Communicate::~Communicate()
 {
-    LoggerI()->info("{} Communicate delete",type);
+    LoggerI()->info("{} Communicate delete",static_cast<uint8_t>(type));
     Stop();
     // TODO how stop thread
 }
@@ -43,7 +44,7 @@ bool Communicate::Connect(string Id, ConnectCallBack cb)
     // 创建Socket
     if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
     {
-        LoggerI()->error("{} Socket creation failed", type);
+        LoggerI()->error("{} Socket creation failed", static_cast<uint8_t>(type));
         WSACleanup();
         return false;
     }
@@ -65,7 +66,7 @@ bool Communicate::Connect(string Id, ConnectCallBack cb)
         }
         else
         {
-            LoggerI()->info("{} Connection success", type);
+            LoggerI()->info("{} Connection success", static_cast<uint8_t>(type));
             cb(true);
             break;
         }
@@ -76,7 +77,7 @@ bool Communicate::Connect(string Id, ConnectCallBack cb)
 
 bool Communicate::Start()
 {
-    LoggerI()->info("{} Communicate Start",type);
+    LoggerI()->info("{} Communicate Start",static_cast<uint8_t>(type));
     
     if(type == CommunicateType::COMMUNICATE_TYPE_CLIENT)
     {
@@ -96,7 +97,7 @@ bool Communicate::Start()
 
 bool Communicate::Stop()
 {
-    LoggerI()->info("{} Stop",type);
+    LoggerI()->info("{} Stop",static_cast<uint8_t>(type));
     // 关闭Socket连接
     closesocket(client_socket);
     // 清理Winsock库
@@ -122,7 +123,7 @@ bool Communicate::SendMessage(std::shared_ptr<RemoteMessage> message)
 
 bool Communicate::CommunicateThreadStart()
 {
-    LoggerI()->info("{} CommunicateThreadStart",type);
+    LoggerI()->info("{} CommunicateThreadStart",static_cast<uint8_t>(type));
 
     EventWorker = std::thread([this]
                               {
@@ -146,7 +147,7 @@ bool Communicate::CommunicateThreadStart()
 
 bool Communicate::NetThreadStart()
 {
-    LoggerI()->info("{} NetThreadStart",type);
+    LoggerI()->info("{} NetThreadStart",static_cast<uint8_t>(type));
 
     NetWorker = std::thread([this]
     {
@@ -168,10 +169,10 @@ void Communicate::ProcessMessageAsClient()
     int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
-        LoggerI()->error("{} Receiving failed, close socket",type);
+        LoggerI()->error("{} Receiving failed, close socket",static_cast<uint8_t>(type));
         closesocket(client_socket);
         client_socket = -1;
-        LoggerI()->error("{} go to RC_STATE_CLOSED",type);
+        LoggerI()->error("{} go to RC_STATE_CLOSED",static_cast<uint8_t>(type));
         this->State = RCState::RC_STATE_CLOSED;
         DecodeImpInstance->CloseRecored();
         return;
@@ -182,7 +183,7 @@ void Communicate::ProcessMessageAsClient()
         PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
         if (callbackfunction == nullptr)
         {
-            LoggerI()->error("{} not find callbackfunction", type);
+            LoggerI()->error("{} not find callbackfunction", static_cast<int>(type));
         }
         // std::cout<<"callbackfunction"<<callbackfunction<<std::endl;
         DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t *>(buffer),
@@ -198,10 +199,10 @@ void Communicate::ProcessMessageAsServer()
     int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
-        LoggerI()->error("{} Receiving failed, close socket", type);
+        LoggerI()->error("{} Receiving failed, close socket", static_cast<uint8_t>(type));
         closesocket(client_socket);
         client_socket = -1;
-        LoggerI()->error("{} go to RC_STATE_CLOSED", type);
+        LoggerI()->error("{} go to RC_STATE_CLOSED", static_cast<uint8_t>(type));
         this->State = RCState::RC_STATE_CLOSED;
         return;
     }
@@ -211,11 +212,11 @@ void Communicate::ProcessMessageAsServer()
         MouseCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_MOUSE];
         if (callbackfunction == nullptr)
         {
-            LoggerI()->error("{} not find callbackfunction", type);
-            return
+            LoggerI()->error("{} not find callbackfunction", static_cast<uint8_t>(type));
+            return;
         }
 
-        callbackfunction(0, 0);
+        callbackfunction(nullptr, 0, 0);
     }
 }
 
@@ -235,7 +236,7 @@ void Communicate::NetMachineState()
         }
         else
         {
-            LoggerI()->info("{} go to RC_STATE_CONNECTING state",type);
+            LoggerI()->info("{} go to RC_STATE_CONNECTING state",static_cast<uint8_t>(type));
             this->State = RCState::RC_STATE_CONNECTING;
         }
         break;
@@ -243,7 +244,7 @@ void Communicate::NetMachineState()
     case RCState::RC_STATE_CONNECTING:
         if (Connect("testid", ConnectCallBackHandler))
         {
-            LoggerI()->info("{} go to RC_STATE_READY state", type);
+            LoggerI()->info("{} go to RC_STATE_READY state", static_cast<uint8_t>(type));
             // DecodeImpInstance->Init();
             this->State = RCState::RC_STATE_READY;
         }

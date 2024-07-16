@@ -13,7 +13,7 @@ extern "C" {
 #include <string>
 #include <functional>
 
-using PlayCallBack = std::function<void(uint8_t*,int)>;
+using PlayCallBack = std::function<void(uint8_t*,int, int)>;
 
 class DecodeImp
 {

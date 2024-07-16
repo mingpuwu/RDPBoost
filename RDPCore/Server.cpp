@@ -124,10 +124,10 @@ bool Server::Init()
         LoggerI()->info("make shared RemServerPoint error");
     }
 
-    RemServerPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_MOUSE, 
-                                    [this](int x, int y){
+    RemServerPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_MOUSE,
+                                    [this](uint8_t* data, int x, int y){
                                         MoveMouse(x, y);
-                                    })
+                                     });
 
     // RemServerPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_MOUSE_PRESS, 
     //                                 [this](int x, int y,){

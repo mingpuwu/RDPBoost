@@ -5,7 +5,7 @@
 #include "Communicate.h"
 #include <windows.h>
 
-using MouseCallBack = std::function<void(int,int)>;
+using MouseCallBack = std::function<void(uint8_t*, int, int)>;
 
 class Server
 {
