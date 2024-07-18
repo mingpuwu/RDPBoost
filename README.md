@@ -13,7 +13,10 @@
 
 ### ✨ [Demo](https://www.example.com/)
 <div align=center>
-  <img src="docs/RemoteDesk.png">
+  <img src="docs/mainpage.png">
+</div>
+<div align=center>
+  <img src="docs/alldesk.png">
 </div>
 ## Install
 
