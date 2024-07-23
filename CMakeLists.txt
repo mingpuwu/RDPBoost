@@ -39,6 +39,7 @@ link_directories(${CMAKE_BINARY_DIR}/"3rdparty/spdlog-1.14.1/")
 add_subdirectory("3rdparty")
 add_subdirectory("FluControls")
 add_subdirectory("FluUtils")
+add_subdirectory("Proto")
 add_subdirectory("RDPCore")
 add_subdirectory("RDPBoost")
 
@@ -73,7 +74,6 @@ install(DIRECTORY StyleSheet
 install(DIRECTORY code
     DESTINATION .
 )
-
 
 set(CPACK_PACKAGE_FILE_NAME "FluGalleryWin64Msvc")
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
