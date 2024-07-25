@@ -23,6 +23,7 @@ target_link_libraries(${TGT}
     PRIVATE
     FluControls
     RDPCore
+    Proto
 )
 
 set_target_properties(${TGT} PROPERTIES

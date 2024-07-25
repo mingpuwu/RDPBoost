@@ -19,6 +19,10 @@ set(SPDLOG_INC_DIR "3rdparty/spdlog-1.14.1/include/")
 set(FFMPEG_DLL_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_DLL_DIR_4_4}")
 set(FFMPEG_INC_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_INC_DIR_4_4}")
 
+set(GEN_PROTO_DIR "${CMAKE_HOME_DIRECTORY}/Proto")
+
+set(PROTOBUFLIB_INC_DIR "3rdparty/protobuf_lib")
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Configuring for Debug build")
     add_definitions(-DDEBUG)
@@ -32,9 +36,12 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${FFMPEG_INC_DIR}
     ${SPDLOG_INC_DIR}
+    ${GEN_PROTO_DIR}
+    ${PROTOBUFLIB_INC_DIR}
     )
 
-link_directories(${CMAKE_BINARY_DIR}/"3rdparty/spdlog-1.14.1/")
+link_directories(${CMAKE_BINARY_DIR}/"3rdparty/spdlog-1.14.1/"
+                 "3rdparty/protobuf_lib")
 
 add_subdirectory("3rdparty")
 add_subdirectory("FluControls")
@@ -61,7 +68,10 @@ target_link_libraries(RDPBoost PRIVATE Qt6::Widgets
                         ${FFMPEG_DLL_DIR}/avformat.lib
                         ${FFMPEG_DLL_DIR}/avutil.lib
                         ${FFMPEG_DLL_DIR}/swscale.lib
-                        libspdlogd.a)
+                        libspdlogd.a
+                        protobuf
+                        protoc
+                        stdc++)
 
 install(DIRECTORY res
     DESTINATION .
