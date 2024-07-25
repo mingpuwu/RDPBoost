@@ -3,6 +3,7 @@
 #include "DecodeImp.h"
 #include "Logger.h"
 #include "Server.h"
+#include "RDPBoost.pb.h"
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -166,6 +167,7 @@ void Communicate::ProcessMessageAsClient()
 {
     // 接收中继服务器的响应
     char buffer[4096];
+    Message recvMessage;
     int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
@@ -179,16 +181,28 @@ void Communicate::ProcessMessageAsClient()
     }
     else
     {
-        // std::cout << "recv server message :" << bytes_received << std::endl;
-        PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
-        if (callbackfunction == nullptr)
+        if(!recvMessage.ParseFromArray(buffer, bytes_received))
         {
-            LoggerI()->error("{} not find callbackfunction", static_cast<int>(type));
+            LoggerI()->error("parse message error");
+            return;
         }
-        // std::cout<<"callbackfunction"<<callbackfunction<<std::endl;
-        DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t *>(buffer),
-                                              bytes_received,
-                                              callbackfunction);
+        
+        if(recvMessage.DataType == Message_DataType::Message_DataType_VIDEO)
+        {
+            LoggerI()->info("{} recv video message", recvMessage.DataType);
+            PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
+            if (callbackfunction == nullptr)
+            {
+                LoggerI()->error("{} not find callbackfunction", static_cast<int>(type));
+            }
+            VideoMessage& videoMessageI = recvMessage.videmessagei();
+            videoMessageI.width();
+            LoggerI()->info("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
+
+            DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t *>(VideoMessage.data().c_str()),
+                                                  bytes_received,
+                                                  callbackfunction);
+        }
     }
 }
 

@@ -40,8 +40,7 @@ include_directories(
     ${PROTOBUFLIB_INC_DIR}
     )
 
-link_directories(${CMAKE_BINARY_DIR}/"3rdparty/spdlog-1.14.1/"
-                 "3rdparty/protobuf_lib")
+link_directories(${CMAKE_BINARY_DIR}/"3rdparty/spdlog-1.14.1/")
 
 add_subdirectory("3rdparty")
 add_subdirectory("FluControls")
@@ -68,10 +67,7 @@ target_link_libraries(RDPBoost PRIVATE Qt6::Widgets
                         ${FFMPEG_DLL_DIR}/avformat.lib
                         ${FFMPEG_DLL_DIR}/avutil.lib
                         ${FFMPEG_DLL_DIR}/swscale.lib
-                        libspdlogd.a
-                        protobuf
-                        protoc
-                        stdc++)
+                        libspdlogd.a)
 
 install(DIRECTORY res
     DESTINATION .
