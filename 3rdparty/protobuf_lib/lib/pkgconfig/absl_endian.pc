@@ -1,0 +1,12 @@
+prefix=C:/Users/mingpu.wu/Downloads/protobuf/install
+exec_prefix=${prefix}
+libdir=C:/Users/mingpu.wu/Downloads/protobuf/install/lib
+includedir=C:/Users/mingpu.wu/Downloads/protobuf/install/include
+
+Name: absl_endian
+Description: Abseil endian library
+URL: https://abseil.io/
+Version: 20240116
+Requires: absl_base = 20240116, absl_config = 20240116, absl_core_headers = 20240116, absl_nullability = 20240116
+Libs: -L${libdir}  
+Cflags: -I${includedir} -DNOMINMAX

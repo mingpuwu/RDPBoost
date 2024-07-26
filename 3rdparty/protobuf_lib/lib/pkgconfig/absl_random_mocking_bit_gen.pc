@@ -1,0 +1,12 @@
+prefix=C:/Users/mingpu.wu/Downloads/protobuf/install
+exec_prefix=${prefix}
+libdir=C:/Users/mingpu.wu/Downloads/protobuf/install/lib
+includedir=C:/Users/mingpu.wu/Downloads/protobuf/install/include
+
+Name: absl_random_mocking_bit_gen
+Description: Abseil random_mocking_bit_gen library
+URL: https://abseil.io/
+Version: 20240116
+Requires: absl_flat_hash_map = 20240116, absl_raw_logging_internal = 20240116, absl_random_distributions = 20240116, absl_random_internal_distribution_caller = 20240116, absl_random_internal_mock_overload_set = 20240116, absl_random_random = 20240116, absl_strings = 20240116, absl_span = 20240116, absl_type_traits = 20240116, absl_utility = 20240116, absl_variant = 20240116
+Libs: -L${libdir}  
+Cflags: -I${includedir} -DNOMINMAX

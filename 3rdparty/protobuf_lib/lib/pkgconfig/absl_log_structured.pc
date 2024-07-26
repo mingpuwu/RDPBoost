@@ -1,0 +1,12 @@
+prefix=C:/Users/mingpu.wu/Downloads/protobuf/install
+exec_prefix=${prefix}
+libdir=C:/Users/mingpu.wu/Downloads/protobuf/install/lib
+includedir=C:/Users/mingpu.wu/Downloads/protobuf/install/include
+
+Name: absl_log_structured
+Description: Abseil log_structured library
+URL: https://abseil.io/
+Version: 20240116
+Requires: absl_config = 20240116, absl_log_internal_structured = 20240116, absl_strings = 20240116
+Libs: -L${libdir}  
+Cflags: -I${includedir} -DNOMINMAX
