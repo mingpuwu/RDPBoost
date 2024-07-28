@@ -24,8 +24,6 @@ message("PROTOBUF_LINK_DIR:${PROTOBUF_LINK_DIR}")
 link_directories(${PROTOBUF_LINK_DIR})
 include_directories("${CMAKE_HOME_DIRECTORY}/3rdparty/protobuf_lib/include")
 
-# #set(GEN_PROTO_DIR "${CMAKE_HOME_DIRECTORY}/Proto")
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Configuring for Debug build")
     add_definitions(-DDEBUG)
