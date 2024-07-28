@@ -1,14 +1,12 @@
 cmake_path(GET CMAKE_CURRENT_LIST_DIR FILENAME ModName)
 string(REPLACE " " "_" ModName ${ModName})
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
-
 set(TGT ${ModName})
 message("ModName: ${ModName}")
 
 FILE(GLOB DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     "*.h"
-    "*.cpp"
+    "*.cc"
 )
 
 message("qt_add_library(\${TGT} STATIC")
@@ -24,8 +22,5 @@ qt_add_library(${TGT}
 
 target_link_libraries(${TGT}
     PUBLIC
-    Qt6::Widgets
-    Qt6::Multimedia
-    Qt6::MultimediaWidgets
-    Proto
+    protobuf
 )

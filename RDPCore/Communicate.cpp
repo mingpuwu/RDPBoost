@@ -3,7 +3,7 @@
 #include "DecodeImp.h"
 #include "Logger.h"
 #include "Server.h"
-#include "RDPBoost.pb.h"
+#include "../Proto/RDPBoost.pb.h"
 #include <iostream>
 #include <thread>
 #include <mutex>

@@ -19,6 +19,11 @@ set(SPDLOG_INC_DIR "3rdparty/spdlog-1.14.1/include/")
 set(FFMPEG_DLL_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_DLL_DIR_4_4}")
 set(FFMPEG_INC_DIR "${CMAKE_HOME_DIRECTORY}/${FFMPEG_INC_DIR_4_4}")
 
+set(PROTOBUF_LINK_DIR "${CMAKE_HOME_DIRECTORY}/3rdparty/protobuf_lib/lib")
+message("PROTOBUF_LINK_DIR:${PROTOBUF_LINK_DIR}")
+link_directories(${PROTOBUF_LINK_DIR})
+include_directories("${CMAKE_HOME_DIRECTORY}/3rdparty/protobuf_lib/include")
+
 # #set(GEN_PROTO_DIR "${CMAKE_HOME_DIRECTORY}/Proto")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -41,7 +46,7 @@ link_directories(${CMAKE_BINARY_DIR}/"3rdparty/spdlog-1.14.1/")
 add_subdirectory("3rdparty")
 add_subdirectory("FluControls")
 add_subdirectory("FluUtils")
-#add_subdirectory("Proto")
+add_subdirectory("Proto")
 add_subdirectory("RDPCore")
 add_subdirectory("RDPBoost")
 
