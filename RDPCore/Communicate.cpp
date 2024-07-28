@@ -1,5 +1,4 @@
 #include "Communicate.h"
-#include "RemoteProtocol.h"
 #include "DecodeImp.h"
 #include "Logger.h"
 #include "Server.h"
@@ -8,6 +7,7 @@
 #include <thread>
 #include <mutex>
 #include <iostream>
+#include <vector>
 #include <winsock2.h>
 
 #pragma comment(lib, "ws2_32.lib")
@@ -15,10 +15,31 @@
 #define RELAY_IP "111.229.134.166"
 #define RELAY_PORT 21220
 
-static int ConnectCallBackHandler(bool status)
+int Communicate::ConnectCallBackHandler(bool status)
 {
     std::cout << "connect success callback" << std::endl;
+    EndPointInfo endPointInfo;
+    endPointInfo.set_id("123456");
+    if(type == CommunicateType::COMMUNICATE_TYPE_CLIENT)
+    {
+        LoggerI()->info("Set communicate type client");
+        endPointInfo.set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_CLIENT);
+    }
+    else
+    {
+        LoggerI()->info("Set communicate type server");
+        endPointInfo.set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_SERVER);
+    }
 
+    LoggerI()->info("EndPointinfo Serializeto array");
+    int infosize = endPointInfo.ByteSizeLong();
+    std::vector<uint8_t> message(infosize);
+
+    endPointInfo.SerializeToArray(static_cast<void*>(message.data()), static_cast<int>(message.size()));
+
+    LoggerI()->info("EndPointinfo send to message list");
+    this->SendMessage(message);
+    
     return 0;
 }
 
@@ -35,7 +56,7 @@ Communicate::~Communicate()
 }
 
 // blocking api
-bool Communicate::Connect(string Id, ConnectCallBack cb)
+bool Communicate::Connect(string Id)
 {
     // JUST connect relay
     sockaddr_in server_address;
@@ -68,7 +89,7 @@ bool Communicate::Connect(string Id, ConnectCallBack cb)
         else
         {
             LoggerI()->info("{} Connection success", static_cast<uint8_t>(type));
-            cb(true);
+            ConnectCallBackHandler(true);
             break;
         }
     }
@@ -112,7 +133,7 @@ SOCKET Communicate::GetSocket()
     return client_socket;
 }
 
-bool Communicate::SendMessage(std::shared_ptr<RemoteMessage> message)
+bool Communicate::SendMessage(std::vector<uint8_t> message)
 {
     // std::cout << "push message to list back" << std::endl;
     std::unique_lock<std::mutex> lc(this->MessageListMutex);
@@ -133,10 +154,19 @@ bool Communicate::CommunicateThreadStart()
             std::unique_lock<std::mutex> lc(this->MessageListMutex);
             while(this->SendMessageList.size() == 0)
                 this->cv.wait(lc);
-            std::shared_ptr<RemoteMessage> message =  SendMessageList.front();
+            std::vector<uint8_t> message =  SendMessageList.front();
             SendMessageList.pop_front();
-            MessageType id = message->GetMessageType();
 
+            const char* sendPoint = reinterpret_cast<char*>(message.data());
+            int sendLen = send(client_socket, sendPoint, message.size(), 0);
+            if(sendLen != message.size())
+            {
+                LoggerI()->error("sendLen message error size {}",sendLen);
+            }
+            else
+            {
+                LoggerI()->info("sendLen message size {}",sendLen);
+            }
             // std::cout<<"message type "<<static_cast<int>(id)<<std::endl;
             // std::cout<<"consumer message: list size:"<<SendMessageList.size()<<std::endl;
         } });
@@ -256,10 +286,9 @@ void Communicate::NetMachineState()
         break;
 
     case RCState::RC_STATE_CONNECTING:
-        if (Connect("testid", ConnectCallBackHandler))
+        if (Connect("testid"))
         {
             LoggerI()->info("{} go to RC_STATE_READY state", static_cast<uint8_t>(type));
-            // DecodeImpInstance->Init();
             this->State = RCState::RC_STATE_READY;
         }
         else

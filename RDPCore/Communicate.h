@@ -1,9 +1,7 @@
 #ifndef CLIENTCOMMUNICATE_H
 #define CLIENTCOMMUNICATE_H
 
-#include "RemoteProtocol.h"
 #include "DecodeImp.h"
-
 #include <string>
 #include <functional>
 #include <memory>
@@ -13,6 +11,7 @@
 #include <thread>
 #include <winsock2.h>
 #include <map>
+#include <vector>
 #include <iostream>
 
 using std::string;
@@ -54,7 +53,7 @@ public:
 
     bool Stop();
 
-    bool SendMessage(std::shared_ptr<RemoteMessage> message);
+    bool SendMessage(std::vector<uint8_t> message);
 
     SOCKET GetSocket();
 
@@ -72,12 +71,14 @@ private:
 
     void ProcessMessageAsServer();
 
-    bool Connect(string Id, ConnectCallBack cb);
+    int ConnectCallBackHandler(bool status);
+
+    bool Connect(string Id);
 
     void NetMachineState();
 
 private:
-    std::list<std::shared_ptr<RemoteMessage>> SendMessageList;
+    std::list<std::vector<uint8_t>> SendMessageList;
 
     std::mutex MessageListMutex;
     std::condition_variable cv;

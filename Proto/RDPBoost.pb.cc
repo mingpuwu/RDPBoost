@@ -36,6 +36,13 @@ class ProtoMessageDefaultTypeInternal {
   const ::MouseMessage* mousemessagei_;
   const ::EndPointInfo* endpointinfoi_;
 } _ProtoMessage_default_instance_;
+<<<<<<< HEAD
+=======
+class EndPointInfoDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<EndPointInfo> _instance;
+} _EndPointInfo_default_instance_;
+>>>>>>> bc899e7db0507b4faf1e348618dc037ab51f35dd
 static void InitDefaultsscc_info_EndPointInfo_RDPBoost_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -135,12 +142,24 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_RDPBoost_2eproto::offsets[] PR
   offsetof(::ProtoMessageDefaultTypeInternal, mousemessagei_),
   offsetof(::ProtoMessageDefaultTypeInternal, endpointinfoi_),
   PROTOBUF_FIELD_OFFSET(::ProtoMessage, data_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::EndPointInfo, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::EndPointInfo, type_),
+  PROTOBUF_FIELD_OFFSET(::EndPointInfo, id_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::VideoMessage)},
   { 10, -1, sizeof(::MouseMessage)},
+<<<<<<< HEAD
   { 18, -1, sizeof(::EndPointInfo)},
   { 25, -1, sizeof(::ProtoMessage)},
+=======
+  { 18, -1, sizeof(::ProtoMessage)},
+  { 27, -1, sizeof(::EndPointInfo)},
+>>>>>>> bc899e7db0507b4faf1e348618dc037ab51f35dd
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -148,6 +167,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_MouseMessage_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_EndPointInfo_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_ProtoMessage_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_EndPointInfo_default_instance_),
 };
 
 const char descriptor_table_protodef_RDPBoost_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -155,6 +175,7 @@ const char descriptor_table_protodef_RDPBoost_2eproto[] PROTOBUF_SECTION_VARIABL
   "h\030\001 \001(\r\022\016\n\006height\030\002 \001(\r\022\022\n\nframe_rate\030\003 "
   "\001(\r\022\020\n\010bit_rate\030\004 \001(\r\022\014\n\004data\030\005 \001(\014\"4\n\014M"
   "ouseMessage\022\t\n\001x\030\001 \001(\r\022\t\n\001y\030\002 \001(\r\022\016\n\006but"
+<<<<<<< HEAD
   "ton\030\003 \001(\r\"r\n\014EndPointInfo\022(\n\004type\030\001 \001(\0162"
   "\032.EndPointInfo.EndPointType\022\n\n\002ID\030\002 \001(\t\""
   ",\n\014EndPointType\022\r\n\tIS_CLIENT\020\000\022\r\n\tIS_SER"
@@ -165,6 +186,17 @@ const char descriptor_table_protodef_RDPBoost_2eproto[] PROTOBUF_SECTION_VARIABL
   "(\0132\r.EndPointInfoH\000\"C\n\010DataType\022\021\n\rVIDEO"
   "_MESSAGE\020\000\022\021\n\rMOUSE_MESSAGE\020\001\022\021\n\rENDPOIN"
   "T_INFO\020\002B\006\n\004datab\006proto3"
+=======
+  "ton\030\003 \001(\r\"\275\001\n\014ProtoMessage\022$\n\004type\030\001 \001(\016"
+  "2\026.ProtoMessage.DataType\022%\n\014VideMessageI"
+  "\030\002 \001(\0132\r.VideoMessageH\000\022&\n\rMouseMessageI"
+  "\030\003 \001(\0132\r.MouseMessageH\000\"0\n\010DataType\022\021\n\rV"
+  "IDEO_MESSAGE\020\000\022\021\n\rMOUSE_MESSAGE\020\001B\006\n\004dat"
+  "a\"y\n\014EndPointInfo\022(\n\004type\030\001 \001(\0162\032.EndPoi"
+  "ntInfo.EndPointType\022\n\n\002id\030\002 \001(\t\"3\n\014EndPo"
+  "intType\022\013\n\007UNKNOWN\020\000\022\n\n\006SERVER\020\001\022\n\n\006CLIE"
+  "NT\020\002b\006proto3"
+>>>>>>> bc899e7db0507b4faf1e348618dc037ab51f35dd
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_RDPBoost_2eproto_deps[1] = {
 };
@@ -177,7 +209,11 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_RDP
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_RDPBoost_2eproto_once;
 static bool descriptor_table_RDPBoost_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_RDPBoost_2eproto = {
+<<<<<<< HEAD
   &descriptor_table_RDPBoost_2eproto_initialized, descriptor_table_protodef_RDPBoost_2eproto, "RDPBoost.proto", 544,
+=======
+  &descriptor_table_RDPBoost_2eproto_initialized, descriptor_table_protodef_RDPBoost_2eproto, "RDPBoost.proto", 492,
+>>>>>>> bc899e7db0507b4faf1e348618dc037ab51f35dd
   &descriptor_table_RDPBoost_2eproto_once, descriptor_table_RDPBoost_2eproto_sccs, descriptor_table_RDPBoost_2eproto_deps, 4, 0,
   schemas, file_default_instances, TableStruct_RDPBoost_2eproto::offsets,
   file_level_metadata_RDPBoost_2eproto, 4, file_level_enum_descriptors_RDPBoost_2eproto, file_level_service_descriptors_RDPBoost_2eproto,
@@ -228,6 +264,29 @@ constexpr ProtoMessage_DataType ProtoMessage::ENDPOINT_INFO;
 constexpr ProtoMessage_DataType ProtoMessage::DataType_MIN;
 constexpr ProtoMessage_DataType ProtoMessage::DataType_MAX;
 constexpr int ProtoMessage::DataType_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* EndPointInfo_EndPointType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_RDPBoost_2eproto);
+  return file_level_enum_descriptors_RDPBoost_2eproto[1];
+}
+bool EndPointInfo_EndPointType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+constexpr EndPointInfo_EndPointType EndPointInfo::UNKNOWN;
+constexpr EndPointInfo_EndPointType EndPointInfo::SERVER;
+constexpr EndPointInfo_EndPointType EndPointInfo::CLIENT;
+constexpr EndPointInfo_EndPointType EndPointInfo::EndPointType_MIN;
+constexpr EndPointInfo_EndPointType EndPointInfo::EndPointType_MAX;
+constexpr int EndPointInfo::EndPointType_ARRAYSIZE;
 #endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 
 // ===================================================================
@@ -1383,6 +1442,233 @@ void ProtoMessage::InternalSwap(ProtoMessage* other) {
 }
 
 
+// ===================================================================
+
+void EndPointInfo::InitAsDefaultInstance() {
+}
+class EndPointInfo::_Internal {
+ public:
+};
+
+EndPointInfo::EndPointInfo()
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:EndPointInfo)
+}
+EndPointInfo::EndPointInfo(const EndPointInfo& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_id().empty()) {
+    id_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.id_);
+  }
+  type_ = from.type_;
+  // @@protoc_insertion_point(copy_constructor:EndPointInfo)
+}
+
+void EndPointInfo::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_EndPointInfo_RDPBoost_2eproto.base);
+  id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  type_ = 0;
+}
+
+EndPointInfo::~EndPointInfo() {
+  // @@protoc_insertion_point(destructor:EndPointInfo)
+  SharedDtor();
+}
+
+void EndPointInfo::SharedDtor() {
+  id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void EndPointInfo::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const EndPointInfo& EndPointInfo::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_EndPointInfo_RDPBoost_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void EndPointInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:EndPointInfo)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  id_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  type_ = 0;
+  _internal_metadata_.Clear();
+}
+
+const char* EndPointInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // .EndPointInfo.EndPointType type = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          CHK_(ptr);
+          _internal_set_type(static_cast<::EndPointInfo_EndPointType>(val));
+        } else goto handle_unusual;
+        continue;
+      // string id = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_id();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "EndPointInfo.id"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* EndPointInfo::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:EndPointInfo)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .EndPointInfo.EndPointType type = 1;
+  if (this->type() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      1, this->_internal_type(), target);
+  }
+
+  // string id = 2;
+  if (this->id().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_id().data(), static_cast<int>(this->_internal_id().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "EndPointInfo.id");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_id(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:EndPointInfo)
+  return target;
+}
+
+size_t EndPointInfo::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:EndPointInfo)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string id = 2;
+  if (this->id().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_id());
+  }
+
+  // .EndPointInfo.EndPointType type = 1;
+  if (this->type() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void EndPointInfo::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:EndPointInfo)
+  GOOGLE_DCHECK_NE(&from, this);
+  const EndPointInfo* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<EndPointInfo>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:EndPointInfo)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:EndPointInfo)
+    MergeFrom(*source);
+  }
+}
+
+void EndPointInfo::MergeFrom(const EndPointInfo& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:EndPointInfo)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.id().size() > 0) {
+
+    id_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.id_);
+  }
+  if (from.type() != 0) {
+    _internal_set_type(from._internal_type());
+  }
+}
+
+void EndPointInfo::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:EndPointInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void EndPointInfo::CopyFrom(const EndPointInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:EndPointInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool EndPointInfo::IsInitialized() const {
+  return true;
+}
+
+void EndPointInfo::InternalSwap(EndPointInfo* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  id_.Swap(&other->id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(type_, other->type_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata EndPointInfo::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::VideoMessage* Arena::CreateMaybeMessage< ::VideoMessage >(Arena* arena) {
@@ -1396,6 +1682,9 @@ template<> PROTOBUF_NOINLINE ::EndPointInfo* Arena::CreateMaybeMessage< ::EndPoi
 }
 template<> PROTOBUF_NOINLINE ::ProtoMessage* Arena::CreateMaybeMessage< ::ProtoMessage >(Arena* arena) {
   return Arena::CreateInternal< ::ProtoMessage >(arena);
+}
+template<> PROTOBUF_NOINLINE ::EndPointInfo* Arena::CreateMaybeMessage< ::EndPointInfo >(Arena* arena) {
+  return Arena::CreateInternal< ::EndPointInfo >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

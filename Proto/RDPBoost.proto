@@ -39,3 +39,15 @@ message ProtoMessage {
     EndPointInfo EndPointInfoI = 4;
   }
 }
+
+message EndPointInfo {
+  enum EndPointType {
+    UNKNOWN = 0;
+    SERVER = 1;
+    CLIENT = 2;
+  }
+
+  EndPointType type = 1;
+
+  string id = 2;
+}
