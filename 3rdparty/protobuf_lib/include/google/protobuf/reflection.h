@@ -1,9 +1,32 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
+// https://developers.google.com/protocol-buffers/
 //
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file or at
-// https://developers.google.com/open-source/licenses/bsd
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+//     * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//     * Neither the name of Google Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This header defines the RepeatedFieldRef class template used to access
 // repeated fields with protobuf reflection API.
@@ -11,17 +34,15 @@
 #define GOOGLE_PROTOBUF_REFLECTION_H__
 
 #include <memory>
-#include <type_traits>
 
-#include "google/protobuf/generated_enum_util.h"
-#include "google/protobuf/descriptor.h"
+#include <google/protobuf/message.h>
+#include <google/protobuf/generated_enum_util.h>
 
 #ifdef SWIG
 #error "You cannot SWIG proto headers"
 #endif
 
-// Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -30,18 +51,17 @@ template <typename T, typename Enable = void>
 struct RefTypeTraits;
 }  // namespace internal
 
-class Message;
+template <typename T>
+RepeatedFieldRef<T> Reflection::GetRepeatedFieldRef(
+    const Message& message, const FieldDescriptor* field) const {
+  return RepeatedFieldRef<T>(message, field);
+}
 
-template <typename Dep, typename T>
-using MakeDependent = std::conditional_t<true, T, Dep>;
-
-// Forward-declare RepeatedFieldRef templates. The second type parameter is
-// used for SFINAE tricks. Users should ignore it.
-template <typename T, typename Enable = void>
-class RepeatedFieldRef;
-
-template <typename T, typename Enable = void>
-class MutableRepeatedFieldRef;
+template <typename T>
+MutableRepeatedFieldRef<T> Reflection::GetMutableRepeatedFieldRef(
+    Message* message, const FieldDescriptor* field) const {
+  return MutableRepeatedFieldRef<T>(message, field);
+}
 
 // RepeatedFieldRef definition for non-message types.
 template <typename T>
@@ -68,11 +88,11 @@ class RepeatedFieldRef<
 
  private:
   friend class Reflection;
-  RepeatedFieldRef(const MakeDependent<T, Message>& message,
-                   const FieldDescriptor* field) {
-    const auto* reflection = message.GetReflection();
-    data_ = reflection->RepeatedFieldData(
-        message, field, internal::RefTypeTraits<T>::cpp_type, nullptr);
+  RepeatedFieldRef(const Message& message, const FieldDescriptor* field) {
+    const Reflection* reflection = message.GetReflection();
+    data_ = reflection->RepeatedFieldData(const_cast<Message*>(&message), field,
+                                          internal::RefTypeTraits<T>::cpp_type,
+                                          NULL);
     accessor_ = reflection->RepeatedFieldAccessor(field);
   }
 
@@ -96,7 +116,6 @@ class MutableRepeatedFieldRef<
   }
   void Add(const T& value) const { accessor_->template Add<T>(data_, value); }
   void RemoveLast() const { accessor_->RemoveLast(data_); }
-  void Reserve(int size) const { accessor_->Reserve(data_, size); }
   void SwapElements(int index1, int index2) const {
     accessor_->SwapElements(data_, index1, index2);
   }
@@ -121,11 +140,10 @@ class MutableRepeatedFieldRef<
 
  private:
   friend class Reflection;
-  MutableRepeatedFieldRef(MakeDependent<T, Message>* message,
-                          const FieldDescriptor* field) {
-    const auto* reflection = message->GetReflection();
+  MutableRepeatedFieldRef(Message* message, const FieldDescriptor* field) {
+    const Reflection* reflection = message->GetReflection();
     data_ = reflection->RepeatedFieldData(
-        message, field, internal::RefTypeTraits<T>::cpp_type, nullptr);
+        message, field, internal::RefTypeTraits<T>::cpp_type, NULL);
     accessor_ = reflection->RepeatedFieldAccessor(field);
   }
 
@@ -157,7 +175,7 @@ class RepeatedFieldRef<
   }
   // Create a new message of the same type as the messages stored in this
   // repeated field. Caller takes ownership of the returned object.
-  T* NewMessage() const { return default_instance_->New(); }
+  T* NewMessage() const { return static_cast<T*>(default_instance_->New()); }
 
   typedef IteratorType iterator;
   typedef IteratorType const_iterator;
@@ -177,20 +195,20 @@ class RepeatedFieldRef<
 
  private:
   friend class Reflection;
-  RepeatedFieldRef(const MakeDependent<T, Message>& message,
-                   const FieldDescriptor* field) {
-    const auto* reflection = message.GetReflection();
+  RepeatedFieldRef(const Message& message, const FieldDescriptor* field) {
+    const Reflection* reflection = message.GetReflection();
     data_ = reflection->RepeatedFieldData(
-        message, field, internal::RefTypeTraits<T>::cpp_type,
+        const_cast<Message*>(&message), field,
+        internal::RefTypeTraits<T>::cpp_type,
         internal::RefTypeTraits<T>::GetMessageFieldDescriptor());
     accessor_ = reflection->RepeatedFieldAccessor(field);
-    default_instance_ = static_cast<const T*>(
-        reflection->GetMessageFactory()->GetPrototype(field->message_type()));
+    default_instance_ =
+        reflection->GetMessageFactory()->GetPrototype(field->message_type());
   }
 
   const void* data_;
   const AccessorType* accessor_;
-  const T* default_instance_;
+  const Message* default_instance_;
 };
 
 // MutableRepeatedFieldRef definition for message types.
@@ -208,14 +226,13 @@ class MutableRepeatedFieldRef<
   }
   // Create a new message of the same type as the messages stored in this
   // repeated field. Caller takes ownership of the returned object.
-  T* NewMessage() const { return default_instance_->New(); }
+  T* NewMessage() const { return static_cast<T*>(default_instance_->New()); }
 
   void Set(int index, const T& value) const {
     accessor_->Set(data_, index, &value);
   }
   void Add(const T& value) const { accessor_->Add(data_, &value); }
   void RemoveLast() const { accessor_->RemoveLast(data_); }
-  void Reserve(int size) const { accessor_->Reserve(data_, size); }
   void SwapElements(int index1, int index2) const {
     accessor_->SwapElements(data_, index1, index2);
   }
@@ -240,20 +257,19 @@ class MutableRepeatedFieldRef<
 
  private:
   friend class Reflection;
-  MutableRepeatedFieldRef(MakeDependent<T, Message>* message,
-                          const FieldDescriptor* field) {
-    const auto* reflection = message->GetReflection();
+  MutableRepeatedFieldRef(Message* message, const FieldDescriptor* field) {
+    const Reflection* reflection = message->GetReflection();
     data_ = reflection->RepeatedFieldData(
         message, field, internal::RefTypeTraits<T>::cpp_type,
         internal::RefTypeTraits<T>::GetMessageFieldDescriptor());
     accessor_ = reflection->RepeatedFieldAccessor(field);
-    default_instance_ = static_cast<const T*>(
-        reflection->GetMessageFactory()->GetPrototype(field->message_type()));
+    default_instance_ =
+        reflection->GetMessageFactory()->GetPrototype(field->message_type());
   }
 
   void* data_;
   const AccessorType* accessor_;
-  const T* default_instance_;
+  const Message* default_instance_;
 };
 
 namespace internal {
@@ -266,19 +282,19 @@ namespace internal {
 // cpp_type to the type that should be used in this interface:
 //
 //   field->cpp_type()      T                Actual type of void*
-//   CPPTYPE_INT32        int32_t                 int32_t
-//   CPPTYPE_UINT32       uint32_t                uint32_t
-//   CPPTYPE_INT64        int64_t                 int64_t
-//   CPPTYPE_UINT64       uint64_t                uint64_t
+//   CPPTYPE_INT32        int32                   int32
+//   CPPTYPE_UINT32       uint32                  uint32
+//   CPPTYPE_INT64        int64                   int64
+//   CPPTYPE_UINT64       uint64                  uint64
 //   CPPTYPE_DOUBLE       double                  double
 //   CPPTYPE_FLOAT        float                   float
 //   CPPTYPE_BOOL         bool                    bool
-//   CPPTYPE_ENUM         generated enum type     int32_t
+//   CPPTYPE_ENUM         generated enum type     int32
 //   CPPTYPE_STRING       string                  std::string
 //   CPPTYPE_MESSAGE      generated message type  google::protobuf::Message
 //                        or google::protobuf::Message
 //
-// Note that for enums we use int32_t in the interface.
+// Note that for enums we use int32 in the interface.
 //
 // You can map from T to the actual type using RefTypeTraits:
 //   typedef RefTypeTraits<T>::AccessorValueType ActualType;
@@ -303,7 +319,6 @@ class PROTOBUF_EXPORT RepeatedFieldAccessor {
   virtual void Set(Field* data, int index, const Value* value) const = 0;
   virtual void Add(Field* data, const Value* value) const = 0;
   virtual void RemoveLast(Field* data) const = 0;
-  virtual void Reserve(Field* data, int size) const = 0;
   virtual void SwapElements(Field* data, int index1, int index2) const = 0;
   virtual void Swap(Field* data, const RepeatedFieldAccessor* other_mutator,
                     Field* other_data) const = 0;
@@ -347,7 +362,7 @@ class PROTOBUF_EXPORT RepeatedFieldAccessor {
     // be ActualType. Here we have a ValueType object and want a ActualType
     // pointer. We can't cast a ValueType pointer to an ActualType pointer
     // directly because their type might be different (for enums ValueType
-    // may be a generated enum type while ActualType is int32_t). To be safe
+    // may be a generated enum type while ActualType is int32). To be safe
     // we make a copy to get a temporary ActualType object and use it.
     ActualType tmp = static_cast<ActualType>(value);
     Set(data, index, static_cast<const Value*>(&tmp));
@@ -361,7 +376,7 @@ class PROTOBUF_EXPORT RepeatedFieldAccessor {
     // be ActualType. Here we have a ValueType object and want a ActualType
     // pointer. We can't cast a ValueType pointer to an ActualType pointer
     // directly because their type might be different (for enums ValueType
-    // may be a generated enum type while ActualType is int32_t). To be safe
+    // may be a generated enum type while ActualType is int32). To be safe
     // we make a copy to get a temporary ActualType object and use it.
     ActualType tmp = static_cast<ActualType>(value);
     Add(data, static_cast<const Value*>(&tmp));
@@ -377,18 +392,13 @@ class PROTOBUF_EXPORT RepeatedFieldAccessor {
 
 // Implement (Mutable)RepeatedFieldRef::iterator
 template <typename T>
-class RepeatedFieldRefIterator {
+class RepeatedFieldRefIterator
+    : public std::iterator<std::forward_iterator_tag, T> {
   typedef typename RefTypeTraits<T>::AccessorValueType AccessorValueType;
   typedef typename RefTypeTraits<T>::IteratorValueType IteratorValueType;
   typedef typename RefTypeTraits<T>::IteratorPointerType IteratorPointerType;
 
  public:
-  using iterator_category = std::forward_iterator_tag;
-  using value_type = T;
-  using pointer = T*;
-  using reference = T&;
-  using difference_type = std::ptrdiff_t;
-
   // Constructor for non-message fields.
   RepeatedFieldRefIterator(const void* data,
                            const RepeatedFieldAccessor* accessor, bool begin)
@@ -461,7 +471,7 @@ class RepeatedFieldRefIterator {
 // RepeatedFieldAccessor type, etc.
 template <typename T>
 struct PrimitiveTraits {
-  static constexpr bool is_primitive = false;
+  static const bool is_primitive = false;
 };
 #define DEFINE_PRIMITIVE(TYPE, type)                 \
   template <>                                        \
@@ -470,10 +480,10 @@ struct PrimitiveTraits {
     static const FieldDescriptor::CppType cpp_type = \
         FieldDescriptor::CPPTYPE_##TYPE;             \
   };
-DEFINE_PRIMITIVE(INT32, int32_t)
-DEFINE_PRIMITIVE(UINT32, uint32_t)
-DEFINE_PRIMITIVE(INT64, int64_t)
-DEFINE_PRIMITIVE(UINT64, uint64_t)
+DEFINE_PRIMITIVE(INT32, int32)
+DEFINE_PRIMITIVE(UINT32, uint32)
+DEFINE_PRIMITIVE(INT64, int64)
+DEFINE_PRIMITIVE(UINT64, uint64)
 DEFINE_PRIMITIVE(FLOAT, float)
 DEFINE_PRIMITIVE(DOUBLE, double)
 DEFINE_PRIMITIVE(BOOL, bool)
@@ -487,9 +497,8 @@ struct RefTypeTraits<
   typedef T AccessorValueType;
   typedef T IteratorValueType;
   typedef T* IteratorPointerType;
-  static constexpr FieldDescriptor::CppType cpp_type =
-      PrimitiveTraits<T>::cpp_type;
-  static const Descriptor* GetMessageFieldDescriptor() { return nullptr; }
+  static const FieldDescriptor::CppType cpp_type = PrimitiveTraits<T>::cpp_type;
+  static const Descriptor* GetMessageFieldDescriptor() { return NULL; }
 };
 
 template <typename T>
@@ -497,13 +506,13 @@ struct RefTypeTraits<
     T, typename std::enable_if<is_proto_enum<T>::value>::type> {
   typedef RepeatedFieldRefIterator<T> iterator;
   typedef RepeatedFieldAccessor AccessorType;
-  // We use int32_t for repeated enums in RepeatedFieldAccessor.
-  typedef int32_t AccessorValueType;
+  // We use int32 for repeated enums in RepeatedFieldAccessor.
+  typedef int32 AccessorValueType;
   typedef T IteratorValueType;
-  typedef int32_t* IteratorPointerType;
-  static constexpr FieldDescriptor::CppType cpp_type =
+  typedef int32* IteratorPointerType;
+  static const FieldDescriptor::CppType cpp_type =
       FieldDescriptor::CPPTYPE_ENUM;
-  static const Descriptor* GetMessageFieldDescriptor() { return nullptr; }
+  static const Descriptor* GetMessageFieldDescriptor() { return NULL; }
 };
 
 template <typename T>
@@ -514,9 +523,9 @@ struct RefTypeTraits<
   typedef std::string AccessorValueType;
   typedef const std::string IteratorValueType;
   typedef const std::string* IteratorPointerType;
-  static constexpr FieldDescriptor::CppType cpp_type =
+  static const FieldDescriptor::CppType cpp_type =
       FieldDescriptor::CPPTYPE_STRING;
-  static const Descriptor* GetMessageFieldDescriptor() { return nullptr; }
+  static const Descriptor* GetMessageFieldDescriptor() { return NULL; }
 };
 
 template <typename T>
@@ -527,7 +536,7 @@ struct MessageDescriptorGetter {
 };
 template <>
 struct MessageDescriptorGetter<Message> {
-  static const Descriptor* get() { return nullptr; }
+  static const Descriptor* get() { return NULL; }
 };
 
 template <typename T>
@@ -538,7 +547,7 @@ struct RefTypeTraits<
   typedef Message AccessorValueType;
   typedef const T& IteratorValueType;
   typedef const T* IteratorPointerType;
-  static constexpr FieldDescriptor::CppType cpp_type =
+  static const FieldDescriptor::CppType cpp_type =
       FieldDescriptor::CPPTYPE_MESSAGE;
   static const Descriptor* GetMessageFieldDescriptor() {
     return MessageDescriptorGetter<T>::get();
@@ -548,6 +557,6 @@ struct RefTypeTraits<
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_REFLECTION_H__

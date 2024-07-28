@@ -19,7 +19,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_cmake_targets_defined "")
 set(_cmake_targets_not_defined "")
 set(_cmake_expected_targets "")
-foreach(_cmake_expected_target IN ITEMS protobuf::libprotobuf-lite protobuf::libprotobuf protobuf::libprotoc protobuf::libupb protobuf::protoc protobuf::protoc-gen-upb protobuf::protoc-gen-upbdefs protobuf::protoc-gen-upb_minitable protobuf::gmock)
+foreach(_cmake_expected_target IN ITEMS protobuf::libprotobuf-lite protobuf::libprotobuf protobuf::libprotoc protobuf::protoc)
   list(APPEND _cmake_expected_targets "${_cmake_expected_target}")
   if(TARGET "${_cmake_expected_target}")
     list(APPEND _cmake_targets_defined "${_cmake_expected_target}")
@@ -59,51 +59,26 @@ endif()
 add_library(protobuf::libprotobuf-lite STATIC IMPORTED)
 
 set_target_properties(protobuf::libprotobuf-lite PROPERTIES
-  INTERFACE_COMPILE_FEATURES "cxx_std_14"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "absl::absl_check;absl::absl_log;absl::algorithm;absl::base;absl::bind_front;absl::bits;absl::btree;absl::cleanup;absl::cord;absl::core_headers;absl::debugging;absl::die_if_null;absl::dynamic_annotations;absl::flags;absl::flat_hash_map;absl::flat_hash_set;absl::function_ref;absl::hash;absl::if_constexpr;absl::layout;absl::log_initialize;absl::log_globals;absl::log_severity;absl::memory;absl::node_hash_map;absl::node_hash_set;absl::optional;absl::random_distributions;absl::random_random;absl::span;absl::status;absl::statusor;absl::strings;absl::synchronization;absl::time;absl::type_traits;absl::utility;absl::variant;\$<LINK_ONLY:utf8_range::utf8_validity>"
 )
 
 # Create imported target protobuf::libprotobuf
 add_library(protobuf::libprotobuf STATIC IMPORTED)
 
 set_target_properties(protobuf::libprotobuf PROPERTIES
-  INTERFACE_COMPILE_FEATURES "cxx_std_14"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "absl::absl_check;absl::absl_log;absl::algorithm;absl::base;absl::bind_front;absl::bits;absl::btree;absl::cleanup;absl::cord;absl::core_headers;absl::debugging;absl::die_if_null;absl::dynamic_annotations;absl::flags;absl::flat_hash_map;absl::flat_hash_set;absl::function_ref;absl::hash;absl::if_constexpr;absl::layout;absl::log_initialize;absl::log_globals;absl::log_severity;absl::memory;absl::node_hash_map;absl::node_hash_set;absl::optional;absl::random_distributions;absl::random_random;absl::span;absl::status;absl::statusor;absl::strings;absl::synchronization;absl::time;absl::type_traits;absl::utility;absl::variant;\$<LINK_ONLY:utf8_range::utf8_validity>"
 )
 
 # Create imported target protobuf::libprotoc
 add_library(protobuf::libprotoc STATIC IMPORTED)
 
 set_target_properties(protobuf::libprotoc PROPERTIES
-  INTERFACE_COMPILE_FEATURES "cxx_std_14"
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:protobuf::libprotobuf>;absl::absl_check;absl::absl_log;absl::algorithm;absl::base;absl::bind_front;absl::bits;absl::btree;absl::cleanup;absl::cord;absl::core_headers;absl::debugging;absl::die_if_null;absl::dynamic_annotations;absl::flags;absl::flat_hash_map;absl::flat_hash_set;absl::function_ref;absl::hash;absl::if_constexpr;absl::layout;absl::log_initialize;absl::log_globals;absl::log_severity;absl::memory;absl::node_hash_map;absl::node_hash_set;absl::optional;absl::random_distributions;absl::random_random;absl::span;absl::status;absl::statusor;absl::strings;absl::synchronization;absl::time;absl::type_traits;absl::utility;absl::variant"
-)
-
-# Create imported target protobuf::libupb
-add_library(protobuf::libupb STATIC IMPORTED)
-
-set_target_properties(protobuf::libupb PROPERTIES
-  INTERFACE_COMPILE_FEATURES "cxx_std_14"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:utf8_range::utf8_range>"
+  INTERFACE_LINK_LIBRARIES "protobuf::libprotobuf"
 )
 
 # Create imported target protobuf::protoc
 add_executable(protobuf::protoc IMPORTED)
-
-# Create imported target protobuf::protoc-gen-upb
-add_executable(protobuf::protoc-gen-upb IMPORTED)
-
-# Create imported target protobuf::protoc-gen-upbdefs
-add_executable(protobuf::protoc-gen-upbdefs IMPORTED)
-
-# Create imported target protobuf::protoc-gen-upb_minitable
-add_executable(protobuf::protoc-gen-upb_minitable IMPORTED)
-
-# Create imported target protobuf::gmock
-add_library(protobuf::gmock STATIC IMPORTED)
 
 # Load information for each installed configuration.
 file(GLOB _cmake_config_files "${CMAKE_CURRENT_LIST_DIR}/protobuf-targets-*.cmake")
@@ -141,24 +116,8 @@ endforeach()
 unset(_cmake_target)
 unset(_cmake_import_check_targets)
 
-# Make sure the targets which have been exported in some other
-# export set exist.
-unset(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets)
-foreach(_target "absl::absl_check" "absl::absl_log" "absl::algorithm" "absl::base" "absl::bind_front" "absl::bits" "absl::btree" "absl::cleanup" "absl::cord" "absl::core_headers" "absl::debugging" "absl::die_if_null" "absl::dynamic_annotations" "absl::flags" "absl::flat_hash_map" "absl::flat_hash_set" "absl::function_ref" "absl::hash" "absl::if_constexpr" "absl::layout" "absl::log_initialize" "absl::log_globals" "absl::log_severity" "absl::memory" "absl::node_hash_map" "absl::node_hash_set" "absl::optional" "absl::random_distributions" "absl::random_random" "absl::span" "absl::status" "absl::statusor" "absl::strings" "absl::synchronization" "absl::time" "absl::type_traits" "absl::utility" "absl::variant" "utf8_range::utf8_validity" "utf8_range::utf8_range" )
-  if(NOT TARGET "${_target}" )
-    set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets "${${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets} ${_target}")
-  endif()
-endforeach()
-
-if(DEFINED ${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets)
-  if(CMAKE_FIND_PACKAGE_NAME)
-    set( ${CMAKE_FIND_PACKAGE_NAME}_FOUND FALSE)
-    set( ${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE "The following imported targets are referenced, but are missing: ${${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets}")
-  else()
-    message(FATAL_ERROR "The following imported targets are referenced, but are missing: ${${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets}")
-  endif()
-endif()
-unset(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets)
+# This file does not depend on other imported targets which have
+# been exported from the same project but in a separate export set.
 
 # Commands beyond this point should not need to know the version.
 set(CMAKE_IMPORT_FILE_VERSION)

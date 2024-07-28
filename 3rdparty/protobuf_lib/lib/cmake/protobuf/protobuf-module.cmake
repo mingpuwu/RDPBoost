@@ -94,13 +94,9 @@ function(_protobuf_find_libraries name filename)
   elseif(${name}_LIBRARY)
     # Honor cache entry used by CMake 3.5 and lower.
     set(${name}_LIBRARIES "${${name}_LIBRARY}" PARENT_SCOPE)
-  elseif(TARGET protobuf::lib${filename})
+  else()
     get_target_property(${name}_LIBRARY_RELEASE protobuf::lib${filename}
       LOCATION_RELEASE)
-    get_target_property(${name}_LIBRARY_RELWITHDEBINFO protobuf::lib${filename}
-      LOCATION_RELWITHDEBINFO)
-    get_target_property(${name}_LIBRARY_MINSIZEREL protobuf::lib${filename}
-      LOCATION_MINSIZEREL)
     get_target_property(${name}_LIBRARY_DEBUG protobuf::lib${filename}
       LOCATION_DEBUG)
 
@@ -108,6 +104,16 @@ function(_protobuf_find_libraries name filename)
     set(${name}_LIBRARY ${${name}_LIBRARY} PARENT_SCOPE)
     set(${name}_LIBRARIES ${${name}_LIBRARIES} PARENT_SCOPE)
   endif()
+endfunction()
+
+# Internal function: find threads library
+function(_protobuf_find_threads)
+    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+    find_package(Threads)
+    if(Threads_FOUND)
+        list(APPEND PROTOBUF_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+        set(PROTOBUF_LIBRARIES "${PROTOBUF_LIBRARIES}" PARENT_SCOPE)
+    endif()
 endfunction()
 
 #
@@ -129,34 +135,28 @@ _protobuf_find_libraries(Protobuf_LITE protobuf-lite)
 # The Protobuf Protoc Library
 _protobuf_find_libraries(Protobuf_PROTOC protoc)
 
+if(UNIX)
+  _protobuf_find_threads()
+endif()
+
 # Set the include directory
 get_target_property(Protobuf_INCLUDE_DIRS protobuf::libprotobuf
   INTERFACE_INCLUDE_DIRECTORIES)
 
 # Set the protoc Executable
-if(NOT Protobuf_PROTOC_EXECUTABLE AND TARGET protobuf::protoc)
+get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc
+  IMPORTED_LOCATION_RELEASE)
+if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
   get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc
-    IMPORTED_LOCATION_RELEASE)
-  if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
-    get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc
-      IMPORTED_LOCATION_RELWITHDEBINFO)
-  endif()
-  if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
-    get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc
-      IMPORTED_LOCATION_MINSIZEREL)
-  endif()
-  if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
-    get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc
-      IMPORTED_LOCATION_DEBUG)
-  endif()
-  if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
-    get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc
-      IMPORTED_LOCATION_NOCONFIG)
-  endif()
+    IMPORTED_LOCATION_DEBUG)
+endif()
+if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
+  get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc
+    IMPORTED_LOCATION_NOCONFIG)
 endif()
 
 # Version info variable
-set(Protobuf_VERSION "29.0.0")
+set(Protobuf_VERSION "3.11.4.0")
 
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(Protobuf
