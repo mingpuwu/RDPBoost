@@ -27,3 +27,15 @@ message ProtoMessage {
     MouseMessage MouseMessageI = 3; // 鼠标数据
   }
 }
+
+message EndPointInfo {
+  enum EndPointType {
+    UNKNOWN = 0;
+    SERVER = 1;
+    CLIENT = 2;
+  }
+
+  EndPointType type = 1;
+
+  string id = 2;
+}
