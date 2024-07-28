@@ -14,10 +14,21 @@ message MouseMessage {
   uint32 button = 3; // 鼠标按键状态
 }
 
+message EndPointInfo {
+  enum EndPointType {
+    IS_CLIENT = 0;
+    IS_SERVER = 1;
+  }
+
+  EndPointType type = 1;
+  string ID = 2;
+}
+
 message ProtoMessage {
   enum DataType {
     VIDEO_MESSAGE = 0;
     MOUSE_MESSAGE = 1;
+    ENDPOINT_INFO = 2;
   }
 
   DataType type = 1; // 第一个字节，表示数据类型
@@ -25,5 +36,6 @@ message ProtoMessage {
   oneof data {
     VideoMessage VideMessageI = 2; // 视频数据
     MouseMessage MouseMessageI = 3; // 鼠标数据
+    EndPointInfo EndPointInfoI = 4;
   }
 }

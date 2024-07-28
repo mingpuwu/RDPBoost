@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
     InitLogger();
-    LoggerI()->info("RDPBoost start................");
+    LoggerI()->info("...................RDPBoost start................");
     FluGalleryWindow w;
     w.show();
 

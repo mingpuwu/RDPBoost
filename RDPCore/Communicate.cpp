@@ -181,29 +181,28 @@ void Communicate::ProcessMessageAsClient()
     }
     else
     {
-        recvMessage.ParseFromArray(static_cast<void*>(buffer),bytes_received);
-        // if(!recvMessage.ParseFromArray(buffer, bytes_received))
-        // {
-        //     LoggerI()->error("parse message error");
-        //     return;
-        // }
+        if(!recvMessage.ParseFromArray(static_cast<void*>(buffer), bytes_received))
+        {
+            LoggerI()->error("parse message error");
+            return;
+        }
         
-        // if(recvMessage.type() == Message_DataType::Message_DataType_VIDEO_MESSAGE)
-        // {
-        //     LoggerI()->info("{} recv video message", recvMessage.type());
-        //     PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
-        //     if (callbackfunction == nullptr)
-        //     {
-        //         LoggerI()->error("{} not find callbackfunction", static_cast<int>(type));
-        //     }
-        //     const VideoMessage& videoMessageI = recvMessage.videmessagei();
-        //     videoMessageI.width();
-        //     LoggerI()->info("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
+        if(recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_VIDEO_MESSAGE)
+        {
+            LoggerI()->info("recv video message");
+            PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
+            if (callbackfunction == nullptr)
+            {
+                LoggerI()->error("{} not find callbackfunction", static_cast<int>(type));
+            }
+            const VideoMessage& videoMessageI = recvMessage.videmessagei();
+            videoMessageI.width();
+            LoggerI()->info("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
 
-        //     // DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t *>(videoMessageI.data().c_str()),
-        //     //                                       bytes_received,
-        //     //                                       callbackfunction);
-        // }
+            // DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t *>(videoMessageI.data().c_str()),
+            //                                       bytes_received,
+            //                                       callbackfunction);
+        }
     }
 }
 

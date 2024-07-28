@@ -73,7 +73,7 @@ static void ScreenCaptureThreadHandler(void* arg)
             }
             else
             {
-                LoggerI()->warn("capture timeout");
+                //LoggerI()->warn("capture timeout");
             }
         }
         else
