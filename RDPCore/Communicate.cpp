@@ -148,6 +148,14 @@ bool Communicate::SendMessage(std::vector<uint8_t> message)
     return true;
 }
 
+bool Communicate::SendMessage(std::string message)
+{
+    std::vector<uint8_t> vec(message.begin(), message.end());
+    std::unique_lock<std::mutex> lc(this->MessageListMutex);
+    this->SendMessageList.push_back(vec);
+    this->cv.notify_all();
+}
+
 bool Communicate::CommunicateThreadStart()
 {
     LoggerI()->info("{} CommunicateThreadStart",static_cast<uint8_t>(type));
@@ -248,6 +256,8 @@ void Communicate::ProcessMessageAsServer()
 {
     // 接收中继服务器的响应
     char buffer[4096];
+    ProtoMessage recvMessage;
+
     int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
@@ -260,15 +270,45 @@ void Communicate::ProcessMessageAsServer()
     }
     else
     {
-        // std::cout << "recv server message :" << bytes_received << std::endl;
-        MouseCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_MOUSE];
-        if (callbackfunction == nullptr)
+        if (!recvMessage.ParseFromArray(static_cast<void *>(buffer), bytes_received))
         {
-            LoggerI()->error("{} not find callbackfunction", static_cast<uint8_t>(type));
+            LoggerI()->error("parse message error");
             return;
         }
 
-        callbackfunction(nullptr, 0, 0);
+        if (recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_STATUS_INFO)
+        {
+            LoggerI()->info("recv status message");
+            ServerCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_STATUS];
+            if (callbackfunction == nullptr)
+            {
+                LoggerI()->error("{} not find status callbackfunction", static_cast<uint8_t>(type));
+                return;
+            }
+            const StatusMessage& statusMessageI = recvMessage.statusmessagei();
+            StatusMessage_StatusType status = statusMessageI.status(); 
+            if(status == StatusMessage_StatusType::StatusMessage_StatusType_CLIENT_ONLINE)
+            {
+                LoggerI()->info("recv Client online");
+                callbackfunction(nullptr, 1, 0);
+            }
+            else
+            {
+                LoggerI()->info("recv Client offline");
+                callbackfunction(nullptr, 0, 0);
+            }
+        }
+        else if (recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_MOUSE_MESSAGE)
+        {
+            ServerCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_MOUSE];
+            if (callbackfunction == nullptr)
+            {
+                LoggerI()->error("{} not find callbackfunction", static_cast<uint8_t>(type));
+                return;
+            }
+
+            callbackfunction(nullptr, 0, 0);
+        }
     }
 }
 

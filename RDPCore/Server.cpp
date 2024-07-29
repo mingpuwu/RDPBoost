@@ -2,20 +2,23 @@
 #include "Communicate.h"
 #include "CdxgiCaptureImpl.h"
 #include "EnCodeImp.h"
+#include "../Proto/RDPBoost.pb.h"
 #include "Logger.h"
 #include <iostream>
 #include <fstream>
 #include <thread>
 #include <Windows.h>
 
-static int ScreenCaptureRunFlag = 0;
-
-static void ScreenCaptureThreadHandler(void* arg)
+void Server::ScreenCaptureThreadHandler()
 {
     LoggerI()->info("ScreenCaptureThreadHandler start");
 
     CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(false);
     EnCodeImp* EncodeImpI = new EnCodeImp();
+
+    EncodeImpI->SetHandlerOneFrame([this](uint8_t* data, int size) {
+        WrapSendOneFrame(data, size);   
+    });
 
     if(EncodeImpI->Init() < 0)
     {
@@ -42,6 +45,12 @@ static void ScreenCaptureThreadHandler(void* arg)
 
     while (ScreenCaptureRunFlag)
     {
+        if(ScreenCaptureRunFlag == 2)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            continue;
+        }
+
         pVideoTexture = NULL;
         pVideoData = NULL;
         nWidthPicth = 0;
@@ -99,10 +108,22 @@ static void ScreenCaptureThreadHandler(void* arg)
 void Server::StartScreenCapture()
 {
     LoggerI()->info("start capture screen");
-    ScreenCaptureRunFlag = 1;
+    ScreenCaptureRunFlag = 2;
 
-    std::thread ScreenCaptureThread(ScreenCaptureThreadHandler, nullptr);
+    std::thread ScreenCaptureThread(std::bind(&Server::ScreenCaptureThreadHandler, this), nullptr);
     ScreenCaptureThread.detach();
+}
+
+void Server::PauseScreenCapture()
+{
+    LoggerI()->info("pause screen");
+    ScreenCaptureRunFlag = 2;
+}
+
+void Server::ResumeScreenCapture()
+{
+    LoggerI()->info("resume screen");
+    ScreenCaptureRunFlag = 1;
 }
 
 void Server::StopScreenCapture()
@@ -129,12 +150,25 @@ bool Server::Init()
                                         MoveMouse(x, y);
                                      });
 
-    // RemServerPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_MOUSE_PRESS, 
-    //                                 [this](int x, int y,){
-    //                                     MoveMouse(x, y);
-    //                                 })  
+    RemServerPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_STATUS,
+                                    [this](uint8_t* data, int x, int y){
+                                        clientStatusNotify(x);
+                                     });
 
+    
     RemServerPoint->Start(); 
+}
+
+void Server::WrapSendOneFrame(uint8_t* data, int size)
+{
+    ProtoMessage message;
+    message.set_type(ProtoMessage_DataType::ProtoMessage_DataType_VIDEO_MESSAGE);
+    message.mutable_videmessagei()->set_width(1920);
+    message.mutable_videmessagei()->set_height(1080);
+    message.mutable_videmessagei()->set_frame_rate(30);
+    message.mutable_videmessagei()->set_data(reinterpret_cast<char*>(data), size);
+
+    RemServerPoint->SendMessage(message.SerializeAsString());
 }
 
 void Server::MoveMouse(int x, int y)
@@ -144,9 +178,23 @@ void Server::MoveMouse(int x, int y)
     SetCursorPos(x, y);
 }
 
-void Server::clickMouse(int x, int y, DWORD buttonFlags)
+void Server::ClickMouse(int x, int y, DWORD buttonFlags)
 {
     //need map to widget
     LoggerI()->info("click mouse {}", buttonFlags);
     mouse_event(buttonFlags, x, y, 0, 0);
+}
+
+void Server::clientStatusNotify(int status)
+{
+    if(status == 1)
+    {
+        LoggerI()->info("client connect");
+        ResumeScreenCapture();
+    }
+    else
+    {
+        LoggerI()->info("client disconnect");
+        PauseScreenCapture();
+    }
 }

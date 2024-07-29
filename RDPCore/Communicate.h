@@ -34,6 +34,7 @@ enum class CommunicateMessageType
     MESSAGE_TYPE_MOUSE,
     MESSAGE_TYPE_MOUSE_PRESS,
     MESSAGE_TYPE_KEYBOARD,
+    MESSAGE_TYPE_STATUS,
 };
 
 enum class CommunicateType
@@ -54,6 +55,8 @@ public:
     bool Stop();
 
     bool SendMessage(std::vector<uint8_t> message);
+
+    bool SendMessage(std::string message);
 
     SOCKET GetSocket();
 

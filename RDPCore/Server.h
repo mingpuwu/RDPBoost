@@ -5,7 +5,7 @@
 #include "Communicate.h"
 #include <windows.h>
 
-using MouseCallBack = std::function<void(uint8_t*, int, int)>;
+using ServerCallBack = std::function<void(uint8_t*, int, int)>;
 
 class Server
 {
@@ -18,9 +18,15 @@ public:
 
     void StopScreenCapture();
 
+    void PauseScreenCapture();
+
+    void ResumeScreenCapture();
+
     void MoveMouse(int x, int y);
 
-    void clickMouse(int x, int y, DWORD buttonFlags);
+    void ClickMouse(int x, int y, DWORD buttonFlags);
+
+    void WrapSendOneFrame(uint8_t* data, int size);
 
     EnCodeImp* EncodeImpI;
 
@@ -28,8 +34,16 @@ private:
     void ScreenCapture();
 
     bool SendVideoStream();
+
+    void clientStatusNotify(int status);
+
+    void Server::ScreenCaptureThreadHandler();
 private:
     Communicate* RemServerPoint;
+
+    bool ClientStatus; //peer client is online or offline
+
+    int ScreenCaptureRunFlag;
 };
 
 #endif // SERVER_H

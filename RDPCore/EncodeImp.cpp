@@ -1,4 +1,5 @@
 #include "EncodeImp.h"
+#include "../Proto/RDPBoost.pb.h"
 extern "C"
 {
 #include <libavcodec/avcodec.h>
@@ -19,6 +20,8 @@ EnCodeImp::EnCodeImp():RecordH264FileName(TESTH264FILE)
     this->width = 1920;
     this->height = 1080;
     this->frame_rate = 30;
+
+    handlerOneFrame = nullptr;
 }
 
 EnCodeImp::~EnCodeImp()
@@ -105,9 +108,17 @@ int EnCodeImp::Init()
     return 0;
 }
 
+void EnCodeImp::SetHandlerOneFrame(HandlerOneFrame handlerOneFrame)
+{
+    this->handlerOneFrame = handlerOneFrame;
+}
+
 int EnCodeImp::HandlerFrameToEncode(uint8_t *data, int size)
 {
     // Convert RGBA to YUV420P
+    char FrameBuffer[1920*1080*4];
+    int FrameSize = 0;
+
     const uint8_t *src_slices[1] = {data};
     int src_stride[1] = {4 * codec_context->width};
     sws_scale(sws_context, src_slices, src_stride, 0, codec_context->height, frame->data, frame->linesize);
@@ -116,9 +127,8 @@ int EnCodeImp::HandlerFrameToEncode(uint8_t *data, int size)
 
     count++;
     frame->pts = count;
-
+    
     DoEncode(frame);
-
     return 0;
 }
 
@@ -143,12 +153,14 @@ void EnCodeImp::DoEncode(AVFrame* frameI)
             fprintf(stderr, "Error during encoding\n");
             return;
         }
+        
+        if(this->handlerOneFrame)
+        {
+            this->handlerOneFrame(pkt->data, pkt->size);
+        }
 
         if(RecordH264File)
-            std::fwrite(pkt->data, pkt->size, 1, RecordH264File);
-
-        //todo
-        
+            std::fwrite(pkt->data, pkt->size, 1, RecordH264File);        
 
         av_packet_unref(pkt);
     }

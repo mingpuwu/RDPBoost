@@ -11,6 +11,9 @@ extern "C" {
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <functional>
+
+using HandlerOneFrame = std::function<void(uint8_t *, int)>;
 
 class EnCodeImp
 {
@@ -23,6 +26,8 @@ public:
 
     int HandlerFrameToEncode(uint8_t *data, int size);
 
+    void SetHandlerOneFrame(HandlerOneFrame handlerOneFrame);
+
 private:
     void DoEncode(AVFrame* frameI);
 
@@ -33,6 +38,7 @@ private:
     AVFrame* rgba_frame = nullptr;
     SwsContext* sws_context = nullptr;
     AVPacket* pkt = nullptr;
+    HandlerOneFrame handlerOneFrame;
     std::string RecordH264FileName;
     FILE* RecordH264File;
     int width;
