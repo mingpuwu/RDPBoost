@@ -24,7 +24,7 @@ message EndPointInfo {
   string ID = 2;
 }
 
-mesage StatusMessage {
+message StatusMessage {
   enum StatusType {
     CLIENT_ONLINE = 0;
     CLIENT_OFFLINE = 1;
