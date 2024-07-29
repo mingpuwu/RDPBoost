@@ -24,11 +24,22 @@ message EndPointInfo {
   string ID = 2;
 }
 
+mesage StatusMessage {
+  enum StatusType {
+    CLIENT_ONLINE = 0;
+    CLIENT_OFFLINE = 1;
+  }
+
+  StatusType Status = 1;
+}
+
+
 message ProtoMessage {
   enum DataType {
     VIDEO_MESSAGE = 0;
     MOUSE_MESSAGE = 1;
     ENDPOINT_INFO = 2;
+    STATUS_INFO = 3;
   }
 
   DataType type = 1; // 第一个字节，表示数据类型
@@ -37,17 +48,6 @@ message ProtoMessage {
     VideoMessage VideMessageI = 2; // 视频数据
     MouseMessage MouseMessageI = 3; // 鼠标数据
     EndPointInfo EndPointInfoI = 4;
+    StatusMessage StatusMessageI = 5;
   }
-}
-
-message EndPointInfo {
-  enum EndPointType {
-    UNKNOWN = 0;
-    SERVER = 1;
-    CLIENT = 2;
-  }
-
-  EndPointType type = 1;
-
-  string id = 2;
 }

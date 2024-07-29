@@ -17,7 +17,7 @@ add_custom_command(
     COMMENT "Generating proto file "
 )
 
-#add_custom_target(protocgen ALL DEPENDS ${PROTO_OUTPUT_DIR})
+add_custom_target(protocgen ALL DEPENDS ${PROTO_OUTPUT_DIR})
 
 set(TGT ${ModName})
 message("ModName: ${ModName}")

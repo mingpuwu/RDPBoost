@@ -18,26 +18,31 @@
 int Communicate::ConnectCallBackHandler(bool status)
 {
     std::cout << "connect success callback" << std::endl;
-    EndPointInfo endPointInfo;
-    endPointInfo.set_id("123456");
+    ProtoMessage sendMessage;
+    sendMessage.set_type(ProtoMessage_DataType::ProtoMessage_DataType_ENDPOINT_INFO);
+    string id("testid");
+    sendMessage.mutable_endpointinfoi()->set_id(id);
     if(type == CommunicateType::COMMUNICATE_TYPE_CLIENT)
     {
         LoggerI()->info("Set communicate type client");
-        endPointInfo.set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_CLIENT);
+        sendMessage.mutable_endpointinfoi()->set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_IS_CLIENT);
     }
     else
     {
         LoggerI()->info("Set communicate type server");
-        endPointInfo.set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_SERVER);
+        sendMessage.mutable_endpointinfoi()->set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_IS_SERVER);
     }
 
     LoggerI()->info("EndPointinfo Serializeto array");
-    int infosize = endPointInfo.ByteSizeLong();
+    int infosize = sendMessage.ByteSizeLong();
+    LoggerI()->info("EndPointinfo Serializeto infosize {}",infosize);
     std::vector<uint8_t> message(infosize);
+    LoggerI()->info("EndPointinfo Serializeto vector size {}",message.size());
 
-    endPointInfo.SerializeToArray(static_cast<void*>(message.data()), static_cast<int>(message.size()));
+    sendMessage.SerializeToArray(static_cast<void*>(message.data()), static_cast<int>(message.size()));
 
     LoggerI()->info("EndPointinfo send to message list");
+
     this->SendMessage(message);
     
     return 0;
@@ -156,7 +161,7 @@ bool Communicate::CommunicateThreadStart()
                 this->cv.wait(lc);
             std::vector<uint8_t> message =  SendMessageList.front();
             SendMessageList.pop_front();
-
+            LoggerI()->info("send message size {}",message.size());
             const char* sendPoint = reinterpret_cast<char*>(message.data());
             int sendLen = send(client_socket, sendPoint, message.size(), 0);
             if(sendLen != message.size())
@@ -229,9 +234,12 @@ void Communicate::ProcessMessageAsClient()
             videoMessageI.width();
             LoggerI()->info("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
 
-            // DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t *>(videoMessageI.data().c_str()),
-            //                                       bytes_received,
-            //                                       callbackfunction);
+            char* dataPoint = const_cast<char*>(videoMessageI.data().c_str());
+            const string &dataString = videoMessageI.data();
+            int dataSize = dataString.size();
+            DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t*>(dataPoint),
+                                                  dataSize,
+                                                  callbackfunction);
         }
     }
 }
