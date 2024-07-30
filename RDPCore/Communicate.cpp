@@ -209,7 +209,7 @@ bool Communicate::NetThreadStart()
 void Communicate::ProcessMessageAsClient()
 {
     // 接收中继服务器的响应
-    char buffer[4096];
+    char buffer[8192];
     ProtoMessage recvMessage;
     int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
@@ -224,6 +224,8 @@ void Communicate::ProcessMessageAsClient()
     }
     else
     {
+        //LoggerI()->info("recv data len {}", bytes_received);
+
         if(!recvMessage.ParseFromArray(static_cast<void*>(buffer), bytes_received))
         {
             LoggerI()->error("parse message error");

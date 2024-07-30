@@ -47,6 +47,7 @@ void Server::ScreenCaptureThreadHandler()
     {
         if(ScreenCaptureRunFlag == 2)
         {
+            // LoggerI()->info("wait client connect.....");
             std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }

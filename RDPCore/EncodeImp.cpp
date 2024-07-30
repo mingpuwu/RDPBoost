@@ -116,9 +116,6 @@ void EnCodeImp::SetHandlerOneFrame(HandlerOneFrame handlerOneFrame)
 int EnCodeImp::HandlerFrameToEncode(uint8_t *data, int size)
 {
     // Convert RGBA to YUV420P
-    char FrameBuffer[1920*1080*4];
-    int FrameSize = 0;
-
     const uint8_t *src_slices[1] = {data};
     int src_stride[1] = {4 * codec_context->width};
     sws_scale(sws_context, src_slices, src_stride, 0, codec_context->height, frame->data, frame->linesize);
