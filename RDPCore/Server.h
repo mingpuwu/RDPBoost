@@ -37,7 +37,7 @@ private:
 
     void clientStatusNotify(int status);
 
-    void Server::ScreenCaptureThreadHandler();
+    void ScreenCaptureThreadHandler();
 private:
     Communicate* RemServerPoint;
 
