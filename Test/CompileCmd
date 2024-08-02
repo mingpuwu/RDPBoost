@@ -1,0 +1,1 @@
+g++ TestProto.cpp ../Proto/RDPBoost.pb.cc -o TestProto -I D:\GitCode\RDPBoost\3rdparty\protobuf_lib\include -L D:\GitCode\RDPBoost\3rdparty\protobuf_lib\lib -lprotobuf
