@@ -157,7 +157,9 @@ bool Server::Init()
                                      });
 
     
-    RemServerPoint->Start(); 
+    RemServerPoint->Start();
+
+    return true;
 }
 
 void Server::WrapSendOneFrame(uint8_t* data, int size)

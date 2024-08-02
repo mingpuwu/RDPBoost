@@ -2,6 +2,7 @@
 #include "DecodeImp.h"
 #include "Logger.h"
 #include "Server.h"
+#include "ProtoParse.h"
 #include "../Proto/RDPBoost.pb.h"
 #include <iostream>
 #include <thread>
@@ -154,6 +155,8 @@ bool Communicate::SendMessage(std::string message)
     std::unique_lock<std::mutex> lc(this->MessageListMutex);
     this->SendMessageList.push_back(vec);
     this->cv.notify_all();
+
+    return true;
 }
 
 bool Communicate::CommunicateThreadStart()
@@ -209,9 +212,9 @@ bool Communicate::NetThreadStart()
 void Communicate::ProcessMessageAsClient()
 {
     // 接收中继服务器的响应
-    char buffer[8192];
+    std::vector<uint8_t> buffer(8192);
     ProtoMessage recvMessage;
-    int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
+    int bytes_received = recv(client_socket, reinterpret_cast<char*>(&buffer[0]), buffer.capacity(), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
         LoggerI()->error("{} Receiving failed, close socket",static_cast<uint8_t>(type));
@@ -225,32 +228,43 @@ void Communicate::ProcessMessageAsClient()
     else
     {
         //LoggerI()->info("recv data len {}", bytes_received);
+        ProcessDatabuffer_client.insert(ProcessDatabuffer_client.end(), buffer.begin(), buffer.begin() + bytes_received);
 
-        if(!recvMessage.ParseFromArray(static_cast<void*>(buffer), bytes_received))
-        {
-            LoggerI()->error("parse message error");
-            return;
-        }
-        
-        if(recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_VIDEO_MESSAGE)
-        {
-            LoggerI()->info("recv video message");
-            PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
-            if (callbackfunction == nullptr)
+        std::vector<std::string> Messages;
+        std::string remainbuffer;
+        if(ProtoParseI.ExtractorMesssage(ProcessDatabuffer_client, Messages, remainbuffer))
+        { 
+            for(auto oneMessage : Messages)
             {
-                LoggerI()->error("{} not find callbackfunction", static_cast<int>(type));
-            }
-            const VideoMessage& videoMessageI = recvMessage.videmessagei();
-            videoMessageI.width();
-            LoggerI()->info("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
+                if(!recvMessage.ParseFromArray(static_cast<void*>(&oneMessage[0]), oneMessage.length()))
+                {
+                    LoggerI()->error("parse message error");
+                    return;
+                }
 
-            char* dataPoint = const_cast<char*>(videoMessageI.data().c_str());
-            const string &dataString = videoMessageI.data();
-            int dataSize = dataString.size();
-            DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t*>(dataPoint),
-                                                  dataSize,
-                                                  callbackfunction);
+                if(recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_VIDEO_MESSAGE)
+                {
+                    LoggerI()->info("recv video message");
+                    PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
+                    if (callbackfunction == nullptr)
+                    {
+                        LoggerI()->error("{} not find callbackfunction", static_cast<int>(type));
+                    }
+                    const VideoMessage& videoMessageI = recvMessage.videmessagei();
+                    videoMessageI.width();
+                    LoggerI()->info("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
+
+                    char* dataPoint = const_cast<char*>(videoMessageI.data().c_str());
+                    const string &dataString = videoMessageI.data();
+                    int dataSize = dataString.size();
+                    DecodeImpInstance->DecodeHandlerFrame(reinterpret_cast<uint8_t*>(dataPoint),
+                                                          dataSize,
+                                                          callbackfunction);
+                }
+            }
         }
+
+        ProcessDatabuffer_client = remainbuffer;
     }
 }
 

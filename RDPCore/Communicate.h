@@ -2,6 +2,7 @@
 #define CLIENTCOMMUNICATE_H
 
 #include "DecodeImp.h"
+#include "ProtoParse.h"
 #include <string>
 #include <functional>
 #include <memory>
@@ -98,5 +99,10 @@ private:
     std::map<CommunicateMessageType, MessageRecvCallBack> CallBackList;
 
     CommunicateType type;
+
+    std::string ProcessDatabuffer_server;
+    std::string ProcessDatabuffer_client;
+
+    ProtoParse ProtoParseI;
 };
 #endif // CLIENTCOMMUNICATE_H
