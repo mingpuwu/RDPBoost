@@ -55,9 +55,9 @@ public:
 
     bool Stop();
 
-    bool SendMessage(std::vector<uint8_t> message);
+    bool CSendMessage(std::vector<uint8_t> message);
 
-    bool SendMessage(std::string message);
+    bool CSendMessage(std::string message);
 
     SOCKET GetSocket();
 

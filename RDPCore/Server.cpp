@@ -156,7 +156,7 @@ bool Server::Init()
                                         clientStatusNotify(x);
                                      });
 
-    
+    LoggerI()->info("RemServerPoint Start");
     RemServerPoint->Start();
 
     return true;
@@ -171,7 +171,7 @@ void Server::WrapSendOneFrame(uint8_t* data, int size)
     message.mutable_videmessagei()->set_frame_rate(30);
     message.mutable_videmessagei()->set_data(reinterpret_cast<char*>(data), size);
 
-    RemServerPoint->SendMessage(message.SerializeAsString());
+    RemServerPoint->CSendMessage(message.SerializeAsString());
 }
 
 void Server::MoveMouse(int x, int y)

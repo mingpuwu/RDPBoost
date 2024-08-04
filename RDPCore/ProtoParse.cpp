@@ -3,11 +3,6 @@
 #include <vector>
 #include <iostream>
 
-//head format: aa 44 12 00 len len len len
-const std::string PROTOHEAD_FLAG = "\xAA\x44\x12";
-static constexpr uint32_t PROTOHEAD_FLAG_LEN = 4;
-static constexpr uint32_t PROTOHEAD_LEN = 8;
-
 ProtoParse::ProtoParse()
 {
 
@@ -44,22 +39,22 @@ int ProtoParse::getOnedata(std::string& input, size_t start_index, std::string &
 
     //std::cout<<"start_index:"<<start_index<<std::endl;
 
-    for(int i = 0; i < 4; i++)
-    {
-        int data = static_cast<int>(input[start_index+PROTOHEAD_FLAG_LEN+i] & 0xFF);
-        //std::cout<<"0x"<<std::hex<<data<<std::endl;
-    }
+    // for(int i = 0; i < 4; i++)
+    // {
+    //     int data = static_cast<int>(input[start_index+PROTOHEAD_FLAG_LEN+i] & 0xFF);
+    //     //std::cout<<"0x"<<std::hex<<data<<std::endl;
+    // }
 
     size_t data_length = ParseUInt32(reinterpret_cast<const uint8_t*>(&input[start_index+PROTOHEAD_FLAG_LEN]));
     
     if(data_length+PROTOHEAD_LEN > input.length()-start_index)
     {
-        std::cout<<"error data_length:"<<data_length<<std::endl;
+        // std::cout<<"error data_length:"<<data_length<<std::endl;
         return -1;
     }
 
     message.resize(data_length);
-    std::copy(&input[start_index], &input[start_index+data_length], &message[0]);
+    std::copy(&input[start_index+PROTOHEAD_LEN], &input[start_index+PROTOHEAD_LEN+data_length], &message[0]);
 
     return data_length+PROTOHEAD_LEN;
 }
@@ -71,8 +66,8 @@ bool ProtoParse::ExtractorMesssage(std::string &input,
     size_t sentence_start = 0;
     bool parse_error = false;
 
-    std::cout<<"input data:"<<input.length()<<std::endl;
-    std::cout<<"input data size:"<<input.size()<<std::endl;
+    // std::cout<<"input data:"<<input.length()<<std::endl;
+    // std::cout<<"input data size:"<<input.size()<<std::endl;
 
     while(sentence_start != std::string::npos && sentence_start < input.size())
     {
@@ -84,12 +79,17 @@ bool ProtoParse::ExtractorMesssage(std::string &input,
             break;
         }
 
-        std::cout<<"find start_index:"<<start_index<<std::endl;
+        // std::cout<<"find start_index:"<<start_index<<std::endl;
 
         //std::cout<<"start index:"<<std::hex<<static_cast<int>(input[0] & 0xFF)<<std::endl;
 
         std::string oneMessage;
         int result = getOnedata(input, start_index, oneMessage);
+
+        // for(int i = 0; i < oneMessage.length(); i++)
+        // {
+        //     LoggerI()->info("1oneMessagei {}",static_cast<int>(oneMessage[i]));
+        // }
 
         if(result > 0)
         {
@@ -101,7 +101,7 @@ bool ProtoParse::ExtractorMesssage(std::string &input,
             //sentence is not complete
             std::cout<<"sentence is not complete:"<<start_index<<std::endl;
             remainbuffer = input.substr(start_index);
-            std::cout<<"remainbuffer len:"<<remainbuffer.length()<<std::endl;
+            // std::cout<<"remainbuffer len:"<<remainbuffer.length()<<std::endl;
             break;
         }
         else

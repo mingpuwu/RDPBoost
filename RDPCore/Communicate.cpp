@@ -4,6 +4,7 @@
 #include "Server.h"
 #include "ProtoParse.h"
 #include "../Proto/RDPBoost.pb.h"
+#include "ProtoParse.h"
 #include <iostream>
 #include <thread>
 #include <mutex>
@@ -44,7 +45,7 @@ int Communicate::ConnectCallBackHandler(bool status)
 
     LoggerI()->info("EndPointinfo send to message list");
 
-    this->SendMessage(message);
+    this->CSendMessage(message);
     
     return 0;
 }
@@ -139,9 +140,15 @@ SOCKET Communicate::GetSocket()
     return client_socket;
 }
 
-bool Communicate::SendMessage(std::vector<uint8_t> message)
+bool Communicate::CSendMessage(std::vector<uint8_t> message)
 {
     // std::cout << "push message to list back" << std::endl;
+    std::vector<uint8_t> head(PROTOHEAD_FLAG.begin(), PROTOHEAD_FLAG.end());
+    head.resize(8);
+    uint32_t len = message.size();
+    std::memcpy(head.data()+PROTOHEAD_FLAG.length(), &len, sizeof(uint32_t));
+    message.insert(message.begin(), head.begin(), head.end());
+
     std::unique_lock<std::mutex> lc(this->MessageListMutex);
     this->SendMessageList.push_back(message);
     this->cv.notify_all();
@@ -149,9 +156,15 @@ bool Communicate::SendMessage(std::vector<uint8_t> message)
     return true;
 }
 
-bool Communicate::SendMessage(std::string message)
+bool Communicate::CSendMessage(std::string message)
 {
+    std::string head{PROTOHEAD_FLAG};
+    head.resize(8);
+    uint32_t len = message.length();
+    std::memcpy(&head[0]+PROTOHEAD_FLAG.length(), &len, sizeof(uint32_t));
+    message.insert(0,head);
     std::vector<uint8_t> vec(message.begin(), message.end());
+
     std::unique_lock<std::mutex> lc(this->MessageListMutex);
     this->SendMessageList.push_back(vec);
     this->cv.notify_all();
@@ -172,7 +185,7 @@ bool Communicate::CommunicateThreadStart()
                 this->cv.wait(lc);
             std::vector<uint8_t> message =  SendMessageList.front();
             SendMessageList.pop_front();
-            LoggerI()->info("send message size {}",message.size());
+            // LoggerI()->info("send message size {}",message.size());
             const char* sendPoint = reinterpret_cast<char*>(message.data());
             int sendLen = send(client_socket, sendPoint, message.size(), 0);
             if(sendLen != message.size())
@@ -181,7 +194,7 @@ bool Communicate::CommunicateThreadStart()
             }
             else
             {
-                LoggerI()->info("sendLen message size {}",sendLen);
+                // LoggerI()->info("sendLen message size {}",sendLen);
             }
             // std::cout<<"message type "<<static_cast<int>(id)<<std::endl;
             // std::cout<<"consumer message: list size:"<<SendMessageList.size()<<std::endl;
@@ -238,7 +251,7 @@ void Communicate::ProcessMessageAsClient()
             {
                 if(!recvMessage.ParseFromArray(static_cast<void*>(&oneMessage[0]), oneMessage.length()))
                 {
-                    LoggerI()->error("parse message error");
+                    LoggerI()->error("client parse message error");
                     return;
                 }
 
@@ -271,10 +284,10 @@ void Communicate::ProcessMessageAsClient()
 void Communicate::ProcessMessageAsServer()
 {
     // 接收中继服务器的响应
-    char buffer[4096];
+    std::vector<uint8_t> buffer(8192);
     ProtoMessage recvMessage;
 
-    int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
+    int bytes_received = recv(client_socket, reinterpret_cast<char*>(&buffer[0]), buffer.capacity(), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
         LoggerI()->error("{} Receiving failed, close socket", static_cast<uint8_t>(type));
@@ -286,45 +299,68 @@ void Communicate::ProcessMessageAsServer()
     }
     else
     {
-        if (!recvMessage.ParseFromArray(static_cast<void *>(buffer), bytes_received))
+        //LoggerI()->info("Recv data len {}",bytes_received);
+        ProcessDatabuffer_server.insert(ProcessDatabuffer_server.end(), buffer.begin(), buffer.begin() + bytes_received);
+
+        std::vector<std::string> Messages;
+        std::string remainbuffer;
+
+        if (ProtoParseI.ExtractorMesssage(ProcessDatabuffer_server, Messages, remainbuffer))
         {
-            LoggerI()->error("parse message error");
-            return;
+            //LoggerI()->info("extractor message {}",Messages.size());
+            for (auto oneMessage : Messages)
+            {
+                //LoggerI()->info("oneMessage len {}",oneMessage.length());
+
+                // for(int i = 0; i < oneMessage.length(); i++)
+                // {
+                //     LoggerI()->info("oneMessagei {}",static_cast<int>(oneMessage[i]));
+                // }
+
+                if (!recvMessage.ParseFromString(oneMessage))
+                {
+                    LoggerI()->error("server parse message error");
+                    continue;
+                }
+
+                if (recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_STATUS_INFO)
+                {
+                    LoggerI()->info("recv status message");
+                    ServerCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_STATUS];
+                    if (callbackfunction == nullptr)
+                    {
+                        LoggerI()->error("{} not find status callbackfunction", static_cast<uint8_t>(type));
+                        continue;
+                    }
+
+                    const StatusMessage& statusMessageI = recvMessage.statusmessagei();
+                    StatusMessage_StatusType status = statusMessageI.status();
+                    if (status == StatusMessage_StatusType::StatusMessage_StatusType_CLIENT_ONLINE)
+                    {
+                        LoggerI()->info("recv Client online");
+                        callbackfunction(nullptr, 1, 0);
+                    }
+                    else
+                    {
+                        LoggerI()->info("recv Client offline");
+                        callbackfunction(nullptr, 0, 0);
+                    }
+                }
+                else if (recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_MOUSE_MESSAGE)
+                {
+                    ServerCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_MOUSE];
+                    if (callbackfunction == nullptr)
+                    {
+                        LoggerI()->error("{} not find callbackfunction", static_cast<uint8_t>(type));
+                        continue;
+                    }
+
+                    callbackfunction(nullptr, 0, 0);
+                }
+            }
         }
 
-        if (recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_STATUS_INFO)
-        {
-            LoggerI()->info("recv status message");
-            ServerCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_STATUS];
-            if (callbackfunction == nullptr)
-            {
-                LoggerI()->error("{} not find status callbackfunction", static_cast<uint8_t>(type));
-                return;
-            }
-            const StatusMessage& statusMessageI = recvMessage.statusmessagei();
-            StatusMessage_StatusType status = statusMessageI.status(); 
-            if(status == StatusMessage_StatusType::StatusMessage_StatusType_CLIENT_ONLINE)
-            {
-                LoggerI()->info("recv Client online");
-                callbackfunction(nullptr, 1, 0);
-            }
-            else
-            {
-                LoggerI()->info("recv Client offline");
-                callbackfunction(nullptr, 0, 0);
-            }
-        }
-        else if (recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_MOUSE_MESSAGE)
-        {
-            ServerCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_MOUSE];
-            if (callbackfunction == nullptr)
-            {
-                LoggerI()->error("{} not find callbackfunction", static_cast<uint8_t>(type));
-                return;
-            }
-
-            callbackfunction(nullptr, 0, 0);
-        }
+        ProcessDatabuffer_server = remainbuffer;
     }
 }
 

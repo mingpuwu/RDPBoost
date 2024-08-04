@@ -7,6 +7,7 @@
 #include <QStackedLayout>
 #include "../FluControls/FluStackedLayout.h"
 #include "../RDPCore/Server.h"
+#include "../RDPCore/Logger.h"
 
 #include <QPainter>
 #include <QStyleOption>
@@ -31,6 +32,7 @@ class FluGalleryWindow : public FluFrameLessWidget
         });
 
         ServerInstance = new Server;
+        LoggerI()->info("Server Init");
         ServerInstance->Init();
         ServerInstance->StartScreenCapture();
     }

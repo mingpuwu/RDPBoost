@@ -6,6 +6,11 @@
 #ifndef PROTOPARSE_H
 #define PROTOPARSE_H
 
+//head format: aa 44 12 55 len len len len
+const std::string PROTOHEAD_FLAG = "\xAA\x44\x12\x55";
+static constexpr uint32_t PROTOHEAD_FLAG_LEN = 4;
+static constexpr uint32_t PROTOHEAD_LEN = 8;
+
 class ProtoParse
 {
 public:
