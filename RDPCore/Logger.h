@@ -10,7 +10,7 @@
 #define SPDLOG_NAME "RDPBoost"
 
 #define LOGGER_DEBUG(...) SPDLOG_LOGGER_DEBUG(LoggerWarp::get_logger(), __VA_ARGS__)
-#define LOGGER_LOG(...) SPDLOG_LOGGER_INFO(LoggerWarp::get_logger(), __VA_ARGS__)
+#define LOGGER_INFO(...) SPDLOG_LOGGER_INFO(LoggerWarp::get_logger(), __VA_ARGS__)
 #define LOGGER_WARN(...) SPDLOG_LOGGER_WARN(LoggerWarp::get_logger(), __VA_ARGS__)
 #define LOGGER_ERROR(...) SPDLOG_LOGGER_ERROR(LoggerWarp::get_logger(), __VA_ARGS__)
 

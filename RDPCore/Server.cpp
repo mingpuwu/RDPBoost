@@ -11,7 +11,7 @@
 
 void Server::ScreenCaptureThreadHandler()
 {
-    LOGGER_LOG("ScreenCaptureThreadHandler start");
+    LOGGER_INFO("ScreenCaptureThreadHandler start");
 
     CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(false);
     EnCodeImp* EncodeImpI = new EnCodeImp();
@@ -47,7 +47,7 @@ void Server::ScreenCaptureThreadHandler()
     {
         if(ScreenCaptureRunFlag == 2)
         {
-            // LOGGER_LOG("wait client connect.....");
+            // LOGGER_INFO("wait client connect.....");
             std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }
@@ -60,7 +60,7 @@ void Server::ScreenCaptureThreadHandler()
         {
             if (pVideoTexture)//纹理捕获成功
             {
-                LOGGER_LOG("capture video succuess");
+                LOGGER_INFO("capture video succuess");
             }
             else if (nWidthPicth > 0)//视频数据捕获成功  pVideoData就是视频RGBA数据
             {
@@ -94,7 +94,7 @@ void Server::ScreenCaptureThreadHandler()
         Sleep(50);
     }
 
-    LOGGER_LOG("ScreenCapture thread stop");
+    LOGGER_INFO("ScreenCapture thread stop");
 
     #ifdef DEBUG
     outfile.flush();
@@ -108,7 +108,7 @@ void Server::ScreenCaptureThreadHandler()
 
 void Server::StartScreenCapture()
 {
-    LOGGER_LOG("start capture screen");
+    LOGGER_INFO("start capture screen");
     ScreenCaptureRunFlag = 2;
 
     std::thread ScreenCaptureThread(std::bind(&Server::ScreenCaptureThreadHandler, this), nullptr);
@@ -117,19 +117,19 @@ void Server::StartScreenCapture()
 
 void Server::PauseScreenCapture()
 {
-    LOGGER_LOG("pause screen");
+    LOGGER_INFO("pause screen");
     ScreenCaptureRunFlag = 2;
 }
 
 void Server::ResumeScreenCapture()
 {
-    LOGGER_LOG("resume screen");
+    LOGGER_INFO("resume screen");
     ScreenCaptureRunFlag = 1;
 }
 
 void Server::StopScreenCapture()
 {
-    LOGGER_LOG("stop screen");
+    LOGGER_INFO("stop screen");
     ScreenCaptureRunFlag = 0;
 }
 
@@ -143,7 +143,7 @@ bool Server::Init()
     RemServerPoint = new Communicate(CommunicateType::COMMUNICATE_TYPE_SERVER);
     if (RemServerPoint == nullptr)
     {
-        LOGGER_LOG("make shared RemServerPoint error");
+        LOGGER_INFO("make shared RemServerPoint error");
     }
 
     RemServerPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_MOUSE,
@@ -156,7 +156,7 @@ bool Server::Init()
                                         clientStatusNotify(x);
                                      });
 
-    LOGGER_LOG("RemServerPoint Start");
+    LOGGER_INFO("RemServerPoint Start");
     RemServerPoint->Start();
 
     return true;
@@ -177,14 +177,14 @@ void Server::WrapSendOneFrame(uint8_t* data, int size)
 void Server::MoveMouse(int x, int y)
 {
     //need map to widget
-    LOGGER_LOG("move mouse to {} {}", x, y);
+    LOGGER_INFO("move mouse to {} {}", x, y);
     SetCursorPos(x, y);
 }
 
 void Server::ClickMouse(int x, int y, DWORD buttonFlags)
 {
     //need map to widget
-    LOGGER_LOG("click mouse {}", buttonFlags);
+    LOGGER_INFO("click mouse {}", buttonFlags);
     mouse_event(buttonFlags, x, y, 0, 0);
 }
 
@@ -192,12 +192,12 @@ void Server::clientStatusNotify(int status)
 {
     if(status == 1)
     {
-        LOGGER_LOG("client connect");
+        LOGGER_INFO("client connect");
         ResumeScreenCapture();
     }
     else
     {
-        LOGGER_LOG("client disconnect");
+        LOGGER_INFO("client disconnect");
         PauseScreenCapture();
     }
 }

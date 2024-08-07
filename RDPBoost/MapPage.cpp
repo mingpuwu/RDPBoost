@@ -14,7 +14,7 @@ MapPage::MapPage(QWidget *parent)
     RemCPoint = new Communicate(CommunicateType::COMMUNICATE_TYPE_CLIENT);
     if (RemCPoint == nullptr)
     {
-        LOGGER_LOG("make shared remotecommunicate error");
+        LOGGER_INFO("make shared remotecommunicate error");
     }
 
     FramePlayer *framePlayerInstance = new FramePlayer(this);
@@ -70,7 +70,7 @@ void MapPage::mousePressEvent(QMouseEvent *event)
 void MapPage::closeEvent(QCloseEvent *event)
 {
     // 在窗口关闭事件发生时执行的代码
-    LOGGER_LOG("MapPage Window is closing");
+    LOGGER_INFO("MapPage Window is closing");
 
     //RemCPoint->DisConnect();
     delete RemCPoint;

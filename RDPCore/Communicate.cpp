@@ -26,24 +26,24 @@ int Communicate::ConnectCallBackHandler(bool status)
     sendMessage.mutable_endpointinfoi()->set_id(id);
     if(type == CommunicateType::COMMUNICATE_TYPE_CLIENT)
     {
-        LOGGER_LOG("Set communicate type client");
+        LOGGER_INFO("Set communicate type client");
         sendMessage.mutable_endpointinfoi()->set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_IS_CLIENT);
     }
     else
     {
-        LOGGER_LOG("Set communicate type server");
+        LOGGER_INFO("Set communicate type server");
         sendMessage.mutable_endpointinfoi()->set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_IS_SERVER);
     }
 
-    LOGGER_LOG("EndPointinfo Serializeto array");
+    LOGGER_INFO("EndPointinfo Serializeto array");
     int infosize = sendMessage.ByteSizeLong();
-    LOGGER_LOG("EndPointinfo Serializeto infosize {}",infosize);
+    LOGGER_INFO("EndPointinfo Serializeto infosize {}",infosize);
     std::vector<uint8_t> message(infosize);
-    LOGGER_LOG("EndPointinfo Serializeto vector size {}",message.size());
+    LOGGER_INFO("EndPointinfo Serializeto vector size {}",message.size());
 
     sendMessage.SerializeToArray(static_cast<void*>(message.data()), static_cast<int>(message.size()));
 
-    LOGGER_LOG("EndPointinfo send to message list");
+    LOGGER_INFO("EndPointinfo send to message list");
 
     this->CSendMessage(message);
     
@@ -52,12 +52,12 @@ int Communicate::ConnectCallBackHandler(bool status)
 
 Communicate::Communicate(CommunicateType t):State(RCState::RC_STATE_INIT),type(t)
 {
-    LOGGER_LOG("{} Communicate Create",static_cast<uint8_t>(type));
+    LOGGER_INFO("{} Communicate Create",static_cast<uint8_t>(type));
 }
 
 Communicate::~Communicate()
 {
-    LOGGER_LOG("{} Communicate delete",static_cast<uint8_t>(type));
+    LOGGER_INFO("{} Communicate delete",static_cast<uint8_t>(type));
     Stop();
     // TODO how stop thread
 }
@@ -95,7 +95,7 @@ bool Communicate::Connect(string Id)
         }
         else
         {
-            LOGGER_LOG("{} Connection success", static_cast<uint8_t>(type));
+            LOGGER_INFO("{} Connection success", static_cast<uint8_t>(type));
             ConnectCallBackHandler(true);
             break;
         }
@@ -106,7 +106,7 @@ bool Communicate::Connect(string Id)
 
 bool Communicate::Start()
 {
-    LOGGER_LOG("{} Communicate Start",static_cast<uint8_t>(type));
+    LOGGER_INFO("{} Communicate Start",static_cast<uint8_t>(type));
     
     if(type == CommunicateType::COMMUNICATE_TYPE_CLIENT)
     {
@@ -126,7 +126,7 @@ bool Communicate::Start()
 
 bool Communicate::Stop()
 {
-    LOGGER_LOG("{} Stop",static_cast<uint8_t>(type));
+    LOGGER_INFO("{} Stop",static_cast<uint8_t>(type));
     // 关闭Socket连接
     closesocket(client_socket);
     // 清理Winsock库
@@ -174,7 +174,7 @@ bool Communicate::CSendMessage(std::string message)
 
 bool Communicate::CommunicateThreadStart()
 {
-    LOGGER_LOG("{} CommunicateThreadStart",static_cast<uint8_t>(type));
+    LOGGER_INFO("{} CommunicateThreadStart",static_cast<uint8_t>(type));
 
     EventWorker = std::thread([this]
                               {
@@ -185,7 +185,7 @@ bool Communicate::CommunicateThreadStart()
                 this->cv.wait(lc);
             std::vector<uint8_t> message =  SendMessageList.front();
             SendMessageList.pop_front();
-            // LOGGER_LOG("send message size {}",message.size());
+            // LOGGER_INFO("send message size {}",message.size());
             const char* sendPoint = reinterpret_cast<char*>(message.data());
             int sendLen = send(client_socket, sendPoint, message.size(), 0);
             if(sendLen != message.size())
@@ -194,7 +194,7 @@ bool Communicate::CommunicateThreadStart()
             }
             else
             {
-                // LOGGER_LOG("sendLen message size {}",sendLen);
+                // LOGGER_INFO("sendLen message size {}",sendLen);
             }
             // std::cout<<"message type "<<static_cast<int>(id)<<std::endl;
             // std::cout<<"consumer message: list size:"<<SendMessageList.size()<<std::endl;
@@ -207,7 +207,7 @@ bool Communicate::CommunicateThreadStart()
 
 bool Communicate::NetThreadStart()
 {
-    LOGGER_LOG("{} NetThreadStart",static_cast<uint8_t>(type));
+    LOGGER_INFO("{} NetThreadStart",static_cast<uint8_t>(type));
 
     NetWorker = std::thread([this]
     {
@@ -240,7 +240,7 @@ void Communicate::ProcessMessageAsClient()
     }
     else
     {
-        //LOGGER_LOG("recv data len {}", bytes_received);
+        //LOGGER_INFO("recv data len {}", bytes_received);
         ProcessDatabuffer_client.insert(ProcessDatabuffer_client.end(), buffer.begin(), buffer.begin() + bytes_received);
 
         std::vector<std::string> Messages;
@@ -257,7 +257,7 @@ void Communicate::ProcessMessageAsClient()
 
                 if(recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_VIDEO_MESSAGE)
                 {
-                    LOGGER_LOG("recv video message");
+                    LOGGER_INFO("recv video message");
                     PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
                     if (callbackfunction == nullptr)
                     {
@@ -265,7 +265,7 @@ void Communicate::ProcessMessageAsClient()
                     }
                     const VideoMessage& videoMessageI = recvMessage.videmessagei();
                     videoMessageI.width();
-                    LOGGER_LOG("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
+                    LOGGER_INFO("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
 
                     char* dataPoint = const_cast<char*>(videoMessageI.data().c_str());
                     const string &dataString = videoMessageI.data();
@@ -299,7 +299,7 @@ void Communicate::ProcessMessageAsServer()
     }
     else
     {
-        //LOGGER_LOG("Recv data len {}",bytes_received);
+        //LOGGER_INFO("Recv data len {}",bytes_received);
         ProcessDatabuffer_server.insert(ProcessDatabuffer_server.end(), buffer.begin(), buffer.begin() + bytes_received);
 
         std::vector<std::string> Messages;
@@ -307,14 +307,14 @@ void Communicate::ProcessMessageAsServer()
 
         if (ProtoParseI.ExtractorMesssage(ProcessDatabuffer_server, Messages, remainbuffer))
         {
-            //LOGGER_LOG("extractor message {}",Messages.size());
+            //LOGGER_INFO("extractor message {}",Messages.size());
             for (auto oneMessage : Messages)
             {
-                //LOGGER_LOG("oneMessage len {}",oneMessage.length());
+                //LOGGER_INFO("oneMessage len {}",oneMessage.length());
 
                 // for(int i = 0; i < oneMessage.length(); i++)
                 // {
-                //     LOGGER_LOG("oneMessagei {}",static_cast<int>(oneMessage[i]));
+                //     LOGGER_INFO("oneMessagei {}",static_cast<int>(oneMessage[i]));
                 // }
 
                 if (!recvMessage.ParseFromString(oneMessage))
@@ -325,7 +325,7 @@ void Communicate::ProcessMessageAsServer()
 
                 if (recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_STATUS_INFO)
                 {
-                    LOGGER_LOG("recv status message");
+                    LOGGER_INFO("recv status message");
                     ServerCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_STATUS];
                     if (callbackfunction == nullptr)
                     {
@@ -337,12 +337,12 @@ void Communicate::ProcessMessageAsServer()
                     StatusMessage_StatusType status = statusMessageI.status();
                     if (status == StatusMessage_StatusType::StatusMessage_StatusType_CLIENT_ONLINE)
                     {
-                        LOGGER_LOG("recv Client online");
+                        LOGGER_INFO("recv Client online");
                         callbackfunction(nullptr, 1, 0);
                     }
                     else
                     {
-                        LOGGER_LOG("recv Client offline");
+                        LOGGER_INFO("recv Client offline");
                         callbackfunction(nullptr, 0, 0);
                     }
                 }
@@ -380,7 +380,7 @@ void Communicate::NetMachineState()
         }
         else
         {
-            LOGGER_LOG("{} go to RC_STATE_CONNECTING state",static_cast<uint8_t>(type));
+            LOGGER_INFO("{} go to RC_STATE_CONNECTING state",static_cast<uint8_t>(type));
             this->State = RCState::RC_STATE_CONNECTING;
         }
         break;
@@ -388,7 +388,7 @@ void Communicate::NetMachineState()
     case RCState::RC_STATE_CONNECTING:
         if (Connect("testid"))
         {
-            LOGGER_LOG("{} go to RC_STATE_READY state", static_cast<uint8_t>(type));
+            LOGGER_INFO("{} go to RC_STATE_READY state", static_cast<uint8_t>(type));
             this->State = RCState::RC_STATE_READY;
         }
         else
