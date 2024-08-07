@@ -45,21 +45,21 @@ int DecodeImp::Init()
                              0, nullptr, nullptr, nullptr);
     if(!sws_ctx)
     {
-        LoggerI()->error("sws_getContext");
+        LOGGER_ERROR("sws_getContext");
         return -1;
     }
 
     codec = avcodec_find_decoder(AV_CODEC_ID_H264);
     if (!codec)
     {
-        LoggerI()->error("Failed to find codec");
+        LOGGER_ERROR("Failed to find codec");
         return -1;
     }
 
     parser = av_parser_init(codec->id);
     if(!parser)
     {
-        LoggerI()->error("parser init error");
+        LOGGER_ERROR("parser init error");
         return -1;
     }
 
@@ -67,28 +67,28 @@ int DecodeImp::Init()
 
     if (avcodec_open2(Decodec_ctx, codec, NULL) < 0)
     {
-        LoggerI()->error("Failed to open codec");
+        LOGGER_ERROR("Failed to open codec");
         return -1;
     }
 
     pkt = av_packet_alloc();
     if(!pkt)
     {
-        LoggerI()->error("alloc pkt error");
+        LOGGER_ERROR("alloc pkt error");
         return -1;
     }
 
     frame = av_frame_alloc();
     if(!frame)
     {
-        LoggerI()->error("alloc frame error");
+        LOGGER_ERROR("alloc frame error");
         return -1;
     }
 
     rgbframe = av_frame_alloc();
     if(!rgbframe)
     {
-        LoggerI()->error("alloc rgbframe error");
+        LOGGER_ERROR("alloc rgbframe error");
         return -1;
     }
 
@@ -99,14 +99,14 @@ int DecodeImp::Init()
     int ret = av_frame_get_buffer(rgbframe, 32);
     if(ret < 0)
     {
-        LoggerI()->error("av_frame_get_buffer error");
+        LOGGER_ERROR("av_frame_get_buffer error");
         return -1;
     }
 
     RecordFile = std::fopen(RecordFileName.c_str(),"wb+");
     if(!RecordFile)
     {
-        LoggerI()->error("open output file error");
+        LOGGER_ERROR("open output file error");
         return -1;
     }
 
@@ -139,7 +139,7 @@ int DecodeImp::DoDecode(PlayCallBack cb)
     int ret = avcodec_send_packet(Decodec_ctx, pkt);
     if(ret < 0)
     {
-        LoggerI()->error("send packet error");
+        LOGGER_ERROR("send packet error");
         return -1;
     }
 
@@ -153,7 +153,7 @@ int DecodeImp::DoDecode(PlayCallBack cb)
         }
         else if (ret < 0)
         {
-            LoggerI()->error("decode error");
+            LOGGER_ERROR("decode error");
             return -1;
         }
         else
@@ -163,7 +163,7 @@ int DecodeImp::DoDecode(PlayCallBack cb)
 
             if(ret < 0)
             {
-                LoggerI()->error("sws_scale error");
+                LOGGER_ERROR("sws_scale error");
             }
             else
             {

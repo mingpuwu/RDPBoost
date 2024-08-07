@@ -88,7 +88,7 @@ bool ProtoParse::ExtractorMesssage(std::string &input,
 
         // for(int i = 0; i < oneMessage.length(); i++)
         // {
-        //     LoggerI()->info("1oneMessagei {}",static_cast<int>(oneMessage[i]));
+        //     LOGGER_LOG("1oneMessagei {}",static_cast<int>(oneMessage[i]));
         // }
 
         if(result > 0)

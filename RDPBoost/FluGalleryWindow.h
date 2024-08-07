@@ -32,7 +32,7 @@ class FluGalleryWindow : public FluFrameLessWidget
         });
 
         ServerInstance = new Server;
-        LoggerI()->info("Server Init");
+        LOGGER_LOG("Server Init");
         ServerInstance->Init();
         ServerInstance->StartScreenCapture();
     }

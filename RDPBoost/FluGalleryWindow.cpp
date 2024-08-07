@@ -45,7 +45,7 @@ FluGalleryWindow::FluGalleryWindow(QWidget *parent /*= nullptr*/) : FluFrameLess
 
 void FluGalleryWindow::closeEvent(QCloseEvent *event)
 {
-    LoggerI()->info("FluGalleryWindow close");
+    LOGGER_LOG("FluGalleryWindow close");
     // FluMessageBox messageBox("Close Gallery Window?", "choose \"Ok\" to close. choose \"Cancel\" do nothing.", this);
     // messageBox.exec();
 

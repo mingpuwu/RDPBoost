@@ -8,8 +8,8 @@
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    InitLogger();
-    LoggerI()->info("...................RDPBoost start................");
+    LoggerWarp::get_logger();
+    LOGGER_LOG("...................RDPBoost start................");
     FluGalleryWindow w;
     w.show();
 

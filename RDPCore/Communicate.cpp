@@ -26,24 +26,24 @@ int Communicate::ConnectCallBackHandler(bool status)
     sendMessage.mutable_endpointinfoi()->set_id(id);
     if(type == CommunicateType::COMMUNICATE_TYPE_CLIENT)
     {
-        LoggerI()->info("Set communicate type client");
+        LOGGER_LOG("Set communicate type client");
         sendMessage.mutable_endpointinfoi()->set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_IS_CLIENT);
     }
     else
     {
-        LoggerI()->info("Set communicate type server");
+        LOGGER_LOG("Set communicate type server");
         sendMessage.mutable_endpointinfoi()->set_type(EndPointInfo_EndPointType::EndPointInfo_EndPointType_IS_SERVER);
     }
 
-    LoggerI()->info("EndPointinfo Serializeto array");
+    LOGGER_LOG("EndPointinfo Serializeto array");
     int infosize = sendMessage.ByteSizeLong();
-    LoggerI()->info("EndPointinfo Serializeto infosize {}",infosize);
+    LOGGER_LOG("EndPointinfo Serializeto infosize {}",infosize);
     std::vector<uint8_t> message(infosize);
-    LoggerI()->info("EndPointinfo Serializeto vector size {}",message.size());
+    LOGGER_LOG("EndPointinfo Serializeto vector size {}",message.size());
 
     sendMessage.SerializeToArray(static_cast<void*>(message.data()), static_cast<int>(message.size()));
 
-    LoggerI()->info("EndPointinfo send to message list");
+    LOGGER_LOG("EndPointinfo send to message list");
 
     this->CSendMessage(message);
     
@@ -52,12 +52,12 @@ int Communicate::ConnectCallBackHandler(bool status)
 
 Communicate::Communicate(CommunicateType t):State(RCState::RC_STATE_INIT),type(t)
 {
-    LoggerI()->info("{} Communicate Create",static_cast<uint8_t>(type));
+    LOGGER_LOG("{} Communicate Create",static_cast<uint8_t>(type));
 }
 
 Communicate::~Communicate()
 {
-    LoggerI()->info("{} Communicate delete",static_cast<uint8_t>(type));
+    LOGGER_LOG("{} Communicate delete",static_cast<uint8_t>(type));
     Stop();
     // TODO how stop thread
 }
@@ -73,7 +73,7 @@ bool Communicate::Connect(string Id)
     // 创建Socket
     if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
     {
-        LoggerI()->error("{} Socket creation failed", static_cast<uint8_t>(type));
+        LOGGER_ERROR("{} Socket creation failed", static_cast<uint8_t>(type));
         WSACleanup();
         return false;
     }
@@ -88,14 +88,14 @@ bool Communicate::Connect(string Id)
     {
         if (connect(client_socket, reinterpret_cast<sockaddr *>(&server_address), sizeof(server_address)) == SOCKET_ERROR)
         {
-            LoggerI()->error("Connection to server failed, server ip:{},prot:{}", server_ip, server_port);
+            LOGGER_ERROR("Connection to server failed, server ip:{},prot:{}", server_ip, server_port);
             closesocket(client_socket);
             std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }
         else
         {
-            LoggerI()->info("{} Connection success", static_cast<uint8_t>(type));
+            LOGGER_LOG("{} Connection success", static_cast<uint8_t>(type));
             ConnectCallBackHandler(true);
             break;
         }
@@ -106,7 +106,7 @@ bool Communicate::Connect(string Id)
 
 bool Communicate::Start()
 {
-    LoggerI()->info("{} Communicate Start",static_cast<uint8_t>(type));
+    LOGGER_LOG("{} Communicate Start",static_cast<uint8_t>(type));
     
     if(type == CommunicateType::COMMUNICATE_TYPE_CLIENT)
     {
@@ -114,7 +114,7 @@ bool Communicate::Start()
 
         if(DecodeImpInstance->Init() < 0)
         {
-            LoggerI()->error("DecodeImp init error");
+            LOGGER_ERROR("DecodeImp init error");
             return false;
         }
     }
@@ -126,7 +126,7 @@ bool Communicate::Start()
 
 bool Communicate::Stop()
 {
-    LoggerI()->info("{} Stop",static_cast<uint8_t>(type));
+    LOGGER_LOG("{} Stop",static_cast<uint8_t>(type));
     // 关闭Socket连接
     closesocket(client_socket);
     // 清理Winsock库
@@ -174,7 +174,7 @@ bool Communicate::CSendMessage(std::string message)
 
 bool Communicate::CommunicateThreadStart()
 {
-    LoggerI()->info("{} CommunicateThreadStart",static_cast<uint8_t>(type));
+    LOGGER_LOG("{} CommunicateThreadStart",static_cast<uint8_t>(type));
 
     EventWorker = std::thread([this]
                               {
@@ -185,16 +185,16 @@ bool Communicate::CommunicateThreadStart()
                 this->cv.wait(lc);
             std::vector<uint8_t> message =  SendMessageList.front();
             SendMessageList.pop_front();
-            // LoggerI()->info("send message size {}",message.size());
+            // LOGGER_LOG("send message size {}",message.size());
             const char* sendPoint = reinterpret_cast<char*>(message.data());
             int sendLen = send(client_socket, sendPoint, message.size(), 0);
             if(sendLen != message.size())
             {
-                LoggerI()->error("sendLen message error size {}",sendLen);
+                LOGGER_ERROR("sendLen message error size {}",sendLen);
             }
             else
             {
-                // LoggerI()->info("sendLen message size {}",sendLen);
+                // LOGGER_LOG("sendLen message size {}",sendLen);
             }
             // std::cout<<"message type "<<static_cast<int>(id)<<std::endl;
             // std::cout<<"consumer message: list size:"<<SendMessageList.size()<<std::endl;
@@ -207,7 +207,7 @@ bool Communicate::CommunicateThreadStart()
 
 bool Communicate::NetThreadStart()
 {
-    LoggerI()->info("{} NetThreadStart",static_cast<uint8_t>(type));
+    LOGGER_LOG("{} NetThreadStart",static_cast<uint8_t>(type));
 
     NetWorker = std::thread([this]
     {
@@ -230,17 +230,17 @@ void Communicate::ProcessMessageAsClient()
     int bytes_received = recv(client_socket, reinterpret_cast<char*>(&buffer[0]), buffer.capacity(), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
-        LoggerI()->error("{} Receiving failed, close socket",static_cast<uint8_t>(type));
+        LOGGER_ERROR("{} Receiving failed, close socket",static_cast<uint8_t>(type));
         closesocket(client_socket);
         client_socket = -1;
-        LoggerI()->error("{} go to RC_STATE_CLOSED",static_cast<uint8_t>(type));
+        LOGGER_ERROR("{} go to RC_STATE_CLOSED",static_cast<uint8_t>(type));
         this->State = RCState::RC_STATE_CLOSED;
         DecodeImpInstance->CloseRecored();
         return;
     }
     else
     {
-        //LoggerI()->info("recv data len {}", bytes_received);
+        //LOGGER_LOG("recv data len {}", bytes_received);
         ProcessDatabuffer_client.insert(ProcessDatabuffer_client.end(), buffer.begin(), buffer.begin() + bytes_received);
 
         std::vector<std::string> Messages;
@@ -251,21 +251,21 @@ void Communicate::ProcessMessageAsClient()
             {
                 if(!recvMessage.ParseFromArray(static_cast<void*>(&oneMessage[0]), oneMessage.length()))
                 {
-                    LoggerI()->error("client parse message error");
+                    LOGGER_ERROR("client parse message error");
                     return;
                 }
 
                 if(recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_VIDEO_MESSAGE)
                 {
-                    LoggerI()->info("recv video message");
+                    LOGGER_LOG("recv video message");
                     PlayCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_VIDEO];
                     if (callbackfunction == nullptr)
                     {
-                        LoggerI()->error("{} not find callbackfunction", static_cast<int>(type));
+                        LOGGER_ERROR("{} not find callbackfunction", static_cast<int>(type));
                     }
                     const VideoMessage& videoMessageI = recvMessage.videmessagei();
                     videoMessageI.width();
-                    LoggerI()->info("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
+                    LOGGER_LOG("{} recv video message width:{} height:{}", videoMessageI.width(), videoMessageI.height());
 
                     char* dataPoint = const_cast<char*>(videoMessageI.data().c_str());
                     const string &dataString = videoMessageI.data();
@@ -290,16 +290,16 @@ void Communicate::ProcessMessageAsServer()
     int bytes_received = recv(client_socket, reinterpret_cast<char*>(&buffer[0]), buffer.capacity(), 0);
     if (bytes_received == SOCKET_ERROR || bytes_received == 0)
     {
-        LoggerI()->error("{} Receiving failed, close socket", static_cast<uint8_t>(type));
+        LOGGER_ERROR("{} Receiving failed, close socket", static_cast<uint8_t>(type));
         closesocket(client_socket);
         client_socket = -1;
-        LoggerI()->error("{} go to RC_STATE_CLOSED", static_cast<uint8_t>(type));
+        LOGGER_ERROR("{} go to RC_STATE_CLOSED", static_cast<uint8_t>(type));
         this->State = RCState::RC_STATE_CLOSED;
         return;
     }
     else
     {
-        //LoggerI()->info("Recv data len {}",bytes_received);
+        //LOGGER_LOG("Recv data len {}",bytes_received);
         ProcessDatabuffer_server.insert(ProcessDatabuffer_server.end(), buffer.begin(), buffer.begin() + bytes_received);
 
         std::vector<std::string> Messages;
@@ -307,29 +307,29 @@ void Communicate::ProcessMessageAsServer()
 
         if (ProtoParseI.ExtractorMesssage(ProcessDatabuffer_server, Messages, remainbuffer))
         {
-            //LoggerI()->info("extractor message {}",Messages.size());
+            //LOGGER_LOG("extractor message {}",Messages.size());
             for (auto oneMessage : Messages)
             {
-                //LoggerI()->info("oneMessage len {}",oneMessage.length());
+                //LOGGER_LOG("oneMessage len {}",oneMessage.length());
 
                 // for(int i = 0; i < oneMessage.length(); i++)
                 // {
-                //     LoggerI()->info("oneMessagei {}",static_cast<int>(oneMessage[i]));
+                //     LOGGER_LOG("oneMessagei {}",static_cast<int>(oneMessage[i]));
                 // }
 
                 if (!recvMessage.ParseFromString(oneMessage))
                 {
-                    LoggerI()->error("server parse message error");
+                    LOGGER_ERROR("server parse message error");
                     continue;
                 }
 
                 if (recvMessage.type() == ProtoMessage_DataType::ProtoMessage_DataType_STATUS_INFO)
                 {
-                    LoggerI()->info("recv status message");
+                    LOGGER_LOG("recv status message");
                     ServerCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_STATUS];
                     if (callbackfunction == nullptr)
                     {
-                        LoggerI()->error("{} not find status callbackfunction", static_cast<uint8_t>(type));
+                        LOGGER_ERROR("{} not find status callbackfunction", static_cast<uint8_t>(type));
                         continue;
                     }
 
@@ -337,12 +337,12 @@ void Communicate::ProcessMessageAsServer()
                     StatusMessage_StatusType status = statusMessageI.status();
                     if (status == StatusMessage_StatusType::StatusMessage_StatusType_CLIENT_ONLINE)
                     {
-                        LoggerI()->info("recv Client online");
+                        LOGGER_LOG("recv Client online");
                         callbackfunction(nullptr, 1, 0);
                     }
                     else
                     {
-                        LoggerI()->info("recv Client offline");
+                        LOGGER_LOG("recv Client offline");
                         callbackfunction(nullptr, 0, 0);
                     }
                 }
@@ -351,7 +351,7 @@ void Communicate::ProcessMessageAsServer()
                     ServerCallBack callbackfunction = CallBackList[CommunicateMessageType::MESSAGE_TYPE_MOUSE];
                     if (callbackfunction == nullptr)
                     {
-                        LoggerI()->error("{} not find callbackfunction", static_cast<uint8_t>(type));
+                        LOGGER_ERROR("{} not find callbackfunction", static_cast<uint8_t>(type));
                         continue;
                     }
 
@@ -380,7 +380,7 @@ void Communicate::NetMachineState()
         }
         else
         {
-            LoggerI()->info("{} go to RC_STATE_CONNECTING state",static_cast<uint8_t>(type));
+            LOGGER_LOG("{} go to RC_STATE_CONNECTING state",static_cast<uint8_t>(type));
             this->State = RCState::RC_STATE_CONNECTING;
         }
         break;
@@ -388,7 +388,7 @@ void Communicate::NetMachineState()
     case RCState::RC_STATE_CONNECTING:
         if (Connect("testid"))
         {
-            LoggerI()->info("{} go to RC_STATE_READY state", static_cast<uint8_t>(type));
+            LOGGER_LOG("{} go to RC_STATE_READY state", static_cast<uint8_t>(type));
             this->State = RCState::RC_STATE_READY;
         }
         else

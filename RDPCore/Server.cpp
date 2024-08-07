@@ -11,7 +11,7 @@
 
 void Server::ScreenCaptureThreadHandler()
 {
-    LoggerI()->info("ScreenCaptureThreadHandler start");
+    LOGGER_LOG("ScreenCaptureThreadHandler start");
 
     CDxgiCaptureImpl *impl = new CDxgiCaptureImpl(false);
     EnCodeImp* EncodeImpI = new EnCodeImp();
@@ -22,14 +22,14 @@ void Server::ScreenCaptureThreadHandler()
 
     if(EncodeImpI->Init() < 0)
     {
-        LoggerI()->error("encode init error");
+        LOGGER_ERROR("encode init error");
         return;
     }
     TDxgiAdapterOutput out = impl->get(L"");
     BOOL bRet = impl->InitDxgiCapture(out);
     if (!bRet)
     {
-        LoggerI()->error("InitDxgiCapture Error");
+        LOGGER_ERROR("InitDxgiCapture Error");
         return;
     }
 
@@ -47,7 +47,7 @@ void Server::ScreenCaptureThreadHandler()
     {
         if(ScreenCaptureRunFlag == 2)
         {
-            // LoggerI()->info("wait client connect.....");
+            // LOGGER_LOG("wait client connect.....");
             std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }
@@ -60,11 +60,11 @@ void Server::ScreenCaptureThreadHandler()
         {
             if (pVideoTexture)//纹理捕获成功
             {
-                LoggerI()->info("capture video succuess");
+                LOGGER_LOG("capture video succuess");
             }
             else if (nWidthPicth > 0)//视频数据捕获成功  pVideoData就是视频RGBA数据
             {
-                LoggerI()->debug("read raw RGBA data");
+                LOGGER_DEBUG("read raw RGBA data");
                 int width = 1920; // 图像宽度
                 int height = 1080; // 图像高度
                 int bytesPerPixel = 4; // 每像素字节数（例如：RGBA 格式）
@@ -83,18 +83,18 @@ void Server::ScreenCaptureThreadHandler()
             }
             else
             {
-                //LoggerI()->warn("capture timeout");
+                //LOGGER_WARN("capture timeout");
             }
         }
         else
         {
-            LoggerI()->warn("capture error,continue");
+            LOGGER_WARN("capture error,continue");
             // break;
         }
         Sleep(50);
     }
 
-    LoggerI()->info("ScreenCapture thread stop");
+    LOGGER_LOG("ScreenCapture thread stop");
 
     #ifdef DEBUG
     outfile.flush();
@@ -108,7 +108,7 @@ void Server::ScreenCaptureThreadHandler()
 
 void Server::StartScreenCapture()
 {
-    LoggerI()->info("start capture screen");
+    LOGGER_LOG("start capture screen");
     ScreenCaptureRunFlag = 2;
 
     std::thread ScreenCaptureThread(std::bind(&Server::ScreenCaptureThreadHandler, this), nullptr);
@@ -117,19 +117,19 @@ void Server::StartScreenCapture()
 
 void Server::PauseScreenCapture()
 {
-    LoggerI()->info("pause screen");
+    LOGGER_LOG("pause screen");
     ScreenCaptureRunFlag = 2;
 }
 
 void Server::ResumeScreenCapture()
 {
-    LoggerI()->info("resume screen");
+    LOGGER_LOG("resume screen");
     ScreenCaptureRunFlag = 1;
 }
 
 void Server::StopScreenCapture()
 {
-    LoggerI()->info("stop screen");
+    LOGGER_LOG("stop screen");
     ScreenCaptureRunFlag = 0;
 }
 
@@ -143,7 +143,7 @@ bool Server::Init()
     RemServerPoint = new Communicate(CommunicateType::COMMUNICATE_TYPE_SERVER);
     if (RemServerPoint == nullptr)
     {
-        LoggerI()->info("make shared RemServerPoint error");
+        LOGGER_LOG("make shared RemServerPoint error");
     }
 
     RemServerPoint->RegisterCallBack(CommunicateMessageType::MESSAGE_TYPE_MOUSE,
@@ -156,7 +156,7 @@ bool Server::Init()
                                         clientStatusNotify(x);
                                      });
 
-    LoggerI()->info("RemServerPoint Start");
+    LOGGER_LOG("RemServerPoint Start");
     RemServerPoint->Start();
 
     return true;
@@ -177,14 +177,14 @@ void Server::WrapSendOneFrame(uint8_t* data, int size)
 void Server::MoveMouse(int x, int y)
 {
     //need map to widget
-    LoggerI()->info("move mouse to {} {}", x, y);
+    LOGGER_LOG("move mouse to {} {}", x, y);
     SetCursorPos(x, y);
 }
 
 void Server::ClickMouse(int x, int y, DWORD buttonFlags)
 {
     //need map to widget
-    LoggerI()->info("click mouse {}", buttonFlags);
+    LOGGER_LOG("click mouse {}", buttonFlags);
     mouse_event(buttonFlags, x, y, 0, 0);
 }
 
@@ -192,12 +192,12 @@ void Server::clientStatusNotify(int status)
 {
     if(status == 1)
     {
-        LoggerI()->info("client connect");
+        LOGGER_LOG("client connect");
         ResumeScreenCapture();
     }
     else
     {
-        LoggerI()->info("client disconnect");
+        LOGGER_LOG("client disconnect");
         PauseScreenCapture();
     }
 }
