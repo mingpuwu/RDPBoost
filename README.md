@@ -31,6 +31,7 @@ RDPBoost.exe
 * Github: [@mingpuwu](https://github.com/mingpuwu)
 
 ## Show your support
+https://github.com/mowangshuying/CppQtFluentUi888
 
 Give a ⭐️ if this project helped you!
 
